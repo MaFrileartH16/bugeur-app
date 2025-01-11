@@ -23,13 +23,11 @@ class BugController extends Controller
     // Proses URL screenshots
     $bugs->each(function ($bug) {
       $bug->screenshots->each(function ($screenshot) {
-        // Jika path tidak dimulai dengan "http" atau "https"
         if (substr($screenshot->images, 0, 4) !== 'http') {
-          $screenshot->path = asset('storage/' . $screenshot->images);
+          $screenshot->images = asset('storage/' . $screenshot->images);
         }
       });
     });
-
 
     return Inertia::render('Bugs/Index', [
       'project' => $project,
@@ -37,22 +35,80 @@ class BugController extends Controller
     ]);
   }
 
+  /**
+   * Show the form for editing the specified bug.
+   */
+  public function edit(Project $project, Bug $bug)
+  {
+    $users = User::all();
+
+    return Inertia::render('Bugs/Edit', [
+      'project' => $project,
+      'bug' => $bug,
+      'users' => $users,
+    ]);
+  }
+
+  /**
+   * Update the specified bug in storage.
+   */
+  public function update(Request $request, Project $project, Bug $bug)
+  {
+    $data = $request->validate([
+      'title' => 'required|string|max:255',
+      'description' => 'required|string',
+      'assignee_id' => 'nullable|exists:users,id',
+      'status' => 'required|in:open,in_progress,resolved,closed',
+      'deadline' => 'nullable|date',
+      'bug_type' => 'required|in:critical,major,minor',
+      'screenshots.*' => 'nullable|image|max:2048',
+    ]);
+
+    // Update data bug
+    $bug->update($data);
+
+    // Jika ada file screenshot baru
+    if ($request->hasFile('screenshots')) {
+      // Hapus semua screenshot lama
+      foreach ($bug->screenshots as $screenshot) {
+        Storage::disk('public')->delete($screenshot->images); // Hapus file fisik
+      }
+      $bug->screenshots()->delete(); // Hapus data dari database
+
+      // Simpan screenshot baru
+      foreach ($request->file('screenshots') as $file) {
+        $path = $file->store('screenshots', 'public');
+        $bug->screenshots()->create(['images' => $path]);
+      }
+    }
+
+    return redirect()
+      ->route('projects.bugs.index', $project->id)
+      ->with('success', 'Bug updated successfully.');
+  }
 
   /**
    * Store a newly created bug in storage.
    */
   public function store(Request $request, Project $project)
   {
-    $data = $request->all();
+    $data = $request->validate([
+      'title' => 'required|string|max:255',
+      'description' => 'required|string',
+      'assignee_id' => 'nullable|exists:users,id',
+      'status' => 'required|in:open,in_progress,resolved,closed',
+      'deadline' => 'nullable|date',
+      'creator_id' => 'required|exists:users,id',
+      'bug_type' => 'required|in:critical,major,minor',
+      'screenshots.*' => 'nullable|image|max:2048',
+    ]);
+
+    $data['project_id'] = $project->id;
 
     // Konversi deadline ke format Y-m-d
     if (!empty($data['deadline'])) {
       $data['deadline'] = date('Y-m-d', strtotime($data['deadline']));
-    } else {
-      $data['deadline'] = null; // Atur ke null jika tidak ada nilai
     }
-
-    $data['project_id'] = $project->id;
 
     $bug = Bug::create($data);
 
@@ -64,7 +120,9 @@ class BugController extends Controller
       }
     }
 
-    return redirect()->route('projects.bugs.index', $project->id)->with('success', 'Bug created successfully.');
+    return redirect()
+      ->route('projects.bugs.index', $project->id)
+      ->with('success', 'Bug created successfully.');
   }
 
 
@@ -84,15 +142,19 @@ class BugController extends Controller
   /**
    * Remove the specified bug from storage.
    */
-  public function destroy(Bug $bug)
+  public function destroy(Project $project, Bug $bug)
   {
     // Hapus semua screenshot terkait
     foreach ($bug->screenshots as $screenshot) {
-      Storage::disk('public')->delete($screenshot->path);
+      Storage::disk('public')->delete($screenshot->images); // Hapus file fisik
     }
 
-    $bug->delete();
+    $bug->screenshots()->delete(); // Hapus data dari database
+    $bug->delete(); // Hapus bug
 
-    return redirect()->route('projects.bugs.index', $bug->project_id)->with('success', 'Bug deleted successfully.');
+    return redirect()
+      ->route('projects.bugs.index', $project->id)
+      ->with('success', 'Bug deleted successfully.');
   }
+
 }

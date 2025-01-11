@@ -10,13 +10,13 @@ const BugsIndex = ({ project, bugs }) => {
     router.get(route('projects.bugs.create', project.id)); // Navigasi ke halaman create bug
   };
 
-  const handleEditBug = (id) => {
-    router.get(route('projects.bugs.edit', id)); // Navigasi ke halaman edit bug
+  const handleEditBug = (projectId, bugId) => {
+    router.get(route('projects.bugs.edit', [projectId, bugId])); // Navigasi ke halaman edit bug dengan projectId dan bugId
   };
 
-  const handleDeleteBug = (id) => {
+  const handleDeleteBug = (projectId, bugId) => {
     if (confirm('Are you sure you want to delete this bug?')) {
-      router.delete(route('bugs.destroy', id), {
+      router.delete(route('projects.bugs.destroy', [projectId, bugId]), {
         onSuccess: () => {
           alert('Bug deleted successfully.');
         },
@@ -62,7 +62,7 @@ const BugsIndex = ({ project, bugs }) => {
                     {bug.screenshots.map((screenshot, index) => (
                       <Image
                         key={index}
-                        src={screenshot.path}
+                        src={screenshot.images}
                         alt={`Screenshot ${index + 1}`}
                         width={50}
                         height={50}
@@ -78,13 +78,13 @@ const BugsIndex = ({ project, bugs }) => {
                 <Group spacing="sm">
                   <ActionIcon
                     color="blue"
-                    onClick={() => handleEditBug(bug.id)}
+                    onClick={() => handleEditBug(project.id, bug.id)}
                   >
                     <IconEdit size={16} />
                   </ActionIcon>
                   <ActionIcon
                     color="red"
-                    onClick={() => handleDeleteBug(bug.id)}
+                    onClick={() => handleDeleteBug(project.id, bug.id)}
                   >
                     <IconTrash size={16} />
                   </ActionIcon>

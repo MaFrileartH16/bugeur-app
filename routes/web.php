@@ -24,7 +24,7 @@ Route::redirect('/', '/projects');
 
 Route::resource('users', UserController::class);
 Route::resource('projects', ProjectController::class);
-Route::resource('projects.bugs', BugController::class)->shallow();
+Route::resource('projects.bugs', BugController::class);
 
 //Route::middleware('auth')->group(function () {
 //  Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

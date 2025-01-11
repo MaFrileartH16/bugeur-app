@@ -25,6 +25,8 @@ const Create = ({ project, users }) => {
     deadline: '', // Tambahkan deadline langsung ke data
   });
 
+  console.log(data);
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -113,7 +115,7 @@ const Create = ({ project, users }) => {
             label="Deadline"
             placeholder="Pick a deadline"
             value={data.deadline}
-            onChange={(value) => setData('deadline', value)} // Set langsung ke data.deadline
+            onChange={(value) => setData('deadline', new Date(value))} // Set langsung ke data.deadline
             error={errors.deadline}
           />
 
