@@ -4,6 +4,7 @@ import './bootstrap';
 import { createInertiaApp } from '@inertiajs/react';
 import { MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
+import { Notifications } from '@mantine/notifications';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 
@@ -19,6 +20,8 @@ createInertiaApp({
   setup({ el, App, props }) {
     const RootApp = (
       <MantineProvider>
+        <Notifications position="top-center" />
+
         <App {...props} />
       </MantineProvider>
     );
