@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
       ProjectSeeder::class,
       WorkingOnSeeder::class,
       BugSeeder::class,
+      ScreenshotSeeder::class,
     ]);
   }
 }
