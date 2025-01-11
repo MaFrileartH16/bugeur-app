@@ -10,7 +10,7 @@ class Screenshot extends Model
 {
   use HasFactory;
 
-  protected $primaryKey = 'image_id';
+  public $timestamps = false;
 
   protected $fillable = [
     'bug_id',
