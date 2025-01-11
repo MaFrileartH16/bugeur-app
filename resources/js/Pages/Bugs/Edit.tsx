@@ -14,7 +14,8 @@ import { DatePickerInput } from '@mantine/dates';
 
 const Edit = ({ project, bug, users }) => {
   console.log(bug);
-  const { data, setData, put, processing, errors } = useForm({
+  const { data, setData, post, processing, errors } = useForm({
+    _method: 'put',
     title: bug.title || '',
     description: bug.description || '',
     assignee_id: bug.assignee_id || '',
@@ -28,7 +29,7 @@ const Edit = ({ project, bug, users }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    put(route('projects.bugs.update', [project.id, bug.id]), {
+    post(route('projects.bugs.update', [project.id, bug.id]), {
       onSuccess: () => {
         console.log('Bug updated successfully!');
       },

@@ -54,26 +54,27 @@ class BugController extends Controller
    */
   public function update(Request $request, Project $project, Bug $bug)
   {
-    $data = $request->validate([
-      'title' => 'required|string|max:255',
-      'description' => 'required|string',
-      'assignee_id' => 'nullable|exists:users,id',
-      'status' => 'required|in:open,in_progress,resolved,closed',
-      'deadline' => 'nullable|date',
-      'bug_type' => 'required|in:critical,major,minor',
-      'screenshots.*' => 'nullable|image|max:2048',
-    ]);
+    $data = $request->all();
+
+    // Konversi deadline ke format Y-m-d
+    if (!empty($data['deadline'])) {
+      $data['deadline'] = date('Y-m-d', strtotime($data['deadline']));
+    }
 
     // Update data bug
     $bug->update($data);
 
     // Jika ada file screenshot baru
     if ($request->hasFile('screenshots')) {
-      // Hapus semua screenshot lama
-      foreach ($bug->screenshots as $screenshot) {
-        Storage::disk('public')->delete($screenshot->images); // Hapus file fisik
+      // Hapus semua screenshot lama berdasarkan bug_id
+      $screenshotPaths = $bug->screenshots()->where('bug_id', $bug->id)->pluck('images');
+
+      foreach ($screenshotPaths as $path) {
+        Storage::disk('public')->delete($path); // Hapus file fisik
       }
-      $bug->screenshots()->delete(); // Hapus data dari database
+
+      // Hapus data screenshot dari database berdasarkan bug_id
+      $bug->screenshots()->where('bug_id', $bug->id)->delete();
 
       // Simpan screenshot baru
       foreach ($request->file('screenshots') as $file) {
@@ -87,22 +88,13 @@ class BugController extends Controller
       ->with('success', 'Bug updated successfully.');
   }
 
+
   /**
    * Store a newly created bug in storage.
    */
   public function store(Request $request, Project $project)
   {
-    $data = $request->validate([
-      'title' => 'required|string|max:255',
-      'description' => 'required|string',
-      'assignee_id' => 'nullable|exists:users,id',
-      'status' => 'required|in:open,in_progress,resolved,closed',
-      'deadline' => 'nullable|date',
-      'creator_id' => 'required|exists:users,id',
-      'bug_type' => 'required|in:critical,major,minor',
-      'screenshots.*' => 'nullable|image|max:2048',
-    ]);
-
+    $data = $request->all();
     $data['project_id'] = $project->id;
 
     // Konversi deadline ke format Y-m-d
@@ -124,7 +116,6 @@ class BugController extends Controller
       ->route('projects.bugs.index', $project->id)
       ->with('success', 'Bug created successfully.');
   }
-
 
   /**
    * Show the form for creating a new bug.
@@ -156,5 +147,4 @@ class BugController extends Controller
       ->route('projects.bugs.index', $project->id)
       ->with('success', 'Bug deleted successfully.');
   }
-
 }

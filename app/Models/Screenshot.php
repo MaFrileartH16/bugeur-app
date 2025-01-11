@@ -19,6 +19,6 @@ class Screenshot extends Model
 
   public function bug(): BelongsTo
   {
-    return $this->belongsTo(Bug::class, 'bug_id');
+    return $this->belongsTo(Bug::class);
   }
 }
