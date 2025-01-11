@@ -26,6 +26,8 @@
         "eslint-plugin-react-hooks": "^4.6.2",
         "laravel-vite-plugin": "^1.1.1",
         "postcss": "^8.4.49",
+        "postcss-preset-mantine": "^1.17.0",
+        "postcss-simple-vars": "^7.0.1",
         "prettier": "^3.4.2",
         "prettier-plugin-organize-imports": "^4.1.0",
         "prettier-plugin-tailwindcss": "^0.6.9",
@@ -49,14 +51,14 @@
         "@mantine/nprogress": "^7.15.3",
         "@mantine/spotlight": "^7.15.3",
         "@mantine/tiptap": "^7.15.3",
+        "@tabler/icons-preact": "^3.28.1",
+        "@tabler/icons-react": "^3.28.1",
         "@tiptap/extension-link": "^2.11.2",
         "@tiptap/pm": "^2.11.2",
         "@tiptap/react": "^2.11.2",
         "@tiptap/starter-kit": "^2.11.2",
         "dayjs": "^1.11.13",
         "embla-carousel-react": "^7.1.0",
-        "postcss-preset-mantine": "^1.17.0",
-        "postcss-simple-vars": "^7.0.1",
         "recharts": "^2.15.0"
     }
 }
