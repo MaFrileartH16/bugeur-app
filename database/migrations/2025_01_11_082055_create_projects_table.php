@@ -11,10 +11,9 @@ return new class extends Migration {
   public function up(): void
   {
     Schema::create('projects', function (Blueprint $table) {
-      $table->string('project_id')->primary();
-      $table->unsignedBigInteger('manager_id');
+      $table->id();
+      $table->foreignId('manager_id')->constrained('users')->cascadeOnDelete();
       $table->string('title');
-      $table->foreign('manager_id')->references('id')->on('users')->onDelete('cascade');
       $table->timestamps();
     });
   }

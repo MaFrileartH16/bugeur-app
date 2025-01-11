@@ -11,18 +11,15 @@ return new class extends Migration {
   public function up(): void
   {
     Schema::create('bugs', function (Blueprint $table) {
-      $table->id('bug_id');
-      $table->unsignedBigInteger('project_id');
+      $table->id();
+      $table->foreignId('project_id')->constrained('projects')->cascadeOnDelete();
       $table->string('title');
-      $table->unsignedBigInteger('assignee_id');
+      $table->foreignId('assignee_id')->nullable()->constrained('users')->nullOnDelete();
       $table->enum('status', ['open', 'in_progress', 'resolved', 'closed']);
       $table->text('description');
-      $table->unsignedBigInteger('creator_id');
+      $table->foreignId('creator_id')->constrained('users')->cascadeOnDelete();
       $table->date('deadline');
       $table->enum('bug_type', ['critical', 'major', 'minor']);
-      $table->foreign('project_id')->references('project_id')->on('projects')->onDelete('cascade');
-      $table->foreign('assignee_id')->references('id')->on('users')->onDelete('set null');
-      $table->foreign('creator_id')->references('id')->on('users')->onDelete('cascade');
       $table->timestamps();
     });
   }

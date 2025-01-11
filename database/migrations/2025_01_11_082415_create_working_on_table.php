@@ -11,11 +11,8 @@ return new class extends Migration {
   public function up(): void
   {
     Schema::create('working_on', function (Blueprint $table) {
-      $table->unsignedBigInteger('project_id');
-      $table->unsignedBigInteger('user_id');
-      $table->foreign('project_id')->references('project_id')->on('projects')->onDelete('cascade');
-      $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-      $table->primary(['project_id', 'user_id']);
+      $table->foreignId('project_id')->constrained()->cascadeOnDelete();
+      $table->foreignId('user_id')->constrained()->cascadeOnDelete();
     });
   }
 

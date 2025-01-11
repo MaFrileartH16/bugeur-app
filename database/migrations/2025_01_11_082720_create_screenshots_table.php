@@ -11,10 +11,9 @@ return new class extends Migration {
   public function up(): void
   {
     Schema::create('screenshots', function (Blueprint $table) {
-      $table->id('image_id');
-      $table->unsignedBigInteger('bug_id');
-      $table->string('images');
-      $table->foreign('bug_id')->references('bug_id')->on('bugs')->onDelete('cascade');
+      $table->id();
+      $table->foreignId('bug_id')->constrained('bugs')->cascadeOnDelete();
+      $table->string('path');
       $table->timestamps();
     });
   }
