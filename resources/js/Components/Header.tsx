@@ -4,7 +4,7 @@ import { Container, Flex } from '@mantine/core';
 
 export const Header = () => {
   return (
-    <Container py={16} bg="red" size="lg" w="100%">
+    <Container py={16} size="lg" w="100%">
       <Flex justify="space-between">
         <NavigationDrawer />
 
