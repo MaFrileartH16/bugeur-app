@@ -11,10 +11,8 @@ return new class extends Migration {
   public function up(): void
   {
     Schema::create('screenshots', function (Blueprint $table) {
-      $table->id();
       $table->foreignId('bug_id')->constrained('bugs')->cascadeOnDelete();
       $table->string('path');
-      $table->timestamps();
     });
   }
 
