@@ -12,7 +12,7 @@ return new class extends Migration {
   {
     Schema::create('screenshots', function (Blueprint $table) {
       $table->foreignId('bug_id')->constrained('bugs')->cascadeOnDelete();
-      $table->string('path');
+      $table->string('images');
     });
   }
 

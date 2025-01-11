@@ -4,6 +4,8 @@ import { ActionIcon, Button, Group, Image, Table, Title } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 
 const BugsIndex = ({ project, bugs }) => {
+  console.log(bugs);
+
   const handleAddBug = () => {
     router.get(route('projects.bugs.create', project.id)); // Navigasi ke halaman create bug
   };

@@ -11,7 +11,6 @@ import {
   Title,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
-import { useState } from 'react';
 
 const Create = ({ project, users }) => {
   const { data, setData, post, processing, errors } = useForm({
@@ -20,19 +19,18 @@ const Create = ({ project, users }) => {
     assignee_id: '',
     status: 'open',
     bug_type: 'minor',
-    screenshots: null, // Untuk menyimpan file screenshots
-    project_id: project.id, // Pastikan project_id dikirim
+    screenshots: null,
+    project_id: project.id,
+    creator_id: '',
+    deadline: '', // Tambahkan deadline langsung ke data
   });
-
-  const [deadline, setDeadline] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setData('deadline', deadline); // Set deadline ke form data
+
     post(route('projects.bugs.store', project.id), {
       onSuccess: () => {
         console.log('Bug created successfully!');
-        setData('screenshots', null); // Reset screenshots
       },
     });
   };
@@ -61,8 +59,20 @@ const Create = ({ project, users }) => {
           />
 
           <Select
+            label="Creator"
+            placeholder="Select creator"
+            data={users.map((user) => ({
+              value: user.id.toString(),
+              label: user.username,
+            }))}
+            value={data.creator_id}
+            onChange={(value) => setData('creator_id', value)}
+            error={errors.creator_id}
+          />
+
+          <Select
             label="Assignee"
-            placeholder="Select a user"
+            placeholder="Select assignee"
             data={users.map((user) => ({
               value: user.id.toString(),
               label: user.username,
@@ -102,8 +112,8 @@ const Create = ({ project, users }) => {
           <DatePickerInput
             label="Deadline"
             placeholder="Pick a deadline"
-            value={deadline}
-            onChange={setDeadline}
+            value={data.deadline}
+            onChange={(value) => setData('deadline', value)} // Set langsung ke data.deadline
             error={errors.deadline}
           />
 

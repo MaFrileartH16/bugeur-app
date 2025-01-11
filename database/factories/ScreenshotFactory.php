@@ -20,7 +20,7 @@ class ScreenshotFactory extends Factory
   {
     return [
       'bug_id' => Bug::inRandomOrder()->value('id') ?? Bug::factory()->create()->id,
-      'path' => $this->faker->imageUrl(),
+      'images' => $this->faker->imageUrl(),
     ];
   }
 }

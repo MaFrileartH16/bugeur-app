@@ -6,8 +6,8 @@ use App\Models\Bug;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
-use Log;
 
 class BugController extends Controller
 {
@@ -20,46 +20,47 @@ class BugController extends Controller
       ->where('project_id', $project->id)
       ->get();
 
+    // Proses URL screenshots
+    $bugs->each(function ($bug) {
+      $bug->screenshots->each(function ($screenshot) {
+        // Jika path tidak dimulai dengan "http" atau "https"
+        if (substr($screenshot->images, 0, 4) !== 'http') {
+          $screenshot->path = asset('storage/' . $screenshot->images);
+        }
+      });
+    });
+
+
     return Inertia::render('Bugs/Index', [
       'project' => $project,
       'bugs' => $bugs,
     ]);
   }
 
+
   /**
    * Store a newly created bug in storage.
    */
   public function store(Request $request, Project $project)
   {
-    $request->validate([
-      'title' => 'required|string|max:255',
-      'description' => 'required|string',
-      'assignee_id' => 'nullable|exists:users,id',
-      'status' => 'required|in:open,in_progress,resolved,closed',
-      'bug_type' => 'required|in:critical,major,minor',
-      'screenshots.*' => 'nullable|image|max:2048',
-    ]);
+    $data = $request->all();
 
-    $creatorId = auth()->id();
-
-    if (!$creatorId) {
-      return redirect()->back()->withErrors(['creator_id' => 'No authenticated user found']);
+    // Konversi deadline ke format Y-m-d
+    if (!empty($data['deadline'])) {
+      $data['deadline'] = date('Y-m-d', strtotime($data['deadline']));
+    } else {
+      $data['deadline'] = null; // Atur ke null jika tidak ada nilai
     }
 
-    $bug = $project->bugs()->create([
-      'title' => $request->title,
-      'description' => $request->description,
-      'assignee_id' => $request->assignee_id,
-      'creator_id' => $creatorId,
-      'status' => $request->status,
-      'deadline' => $request->deadline,
-      'bug_type' => $request->bug_type,
-    ]);
+    $data['project_id'] = $project->id;
 
+    $bug = Bug::create($data);
+
+    // Simpan screenshots jika ada
     if ($request->hasFile('screenshots')) {
       foreach ($request->file('screenshots') as $file) {
         $path = $file->store('screenshots', 'public');
-        $bug->screenshots()->create(['path' => $path]);
+        $bug->screenshots()->create(['images' => $path]);
       }
     }
 
@@ -80,11 +81,18 @@ class BugController extends Controller
     ]);
   }
 
+  /**
+   * Remove the specified bug from storage.
+   */
   public function destroy(Bug $bug)
   {
+    // Hapus semua screenshot terkait
+    foreach ($bug->screenshots as $screenshot) {
+      Storage::disk('public')->delete($screenshot->path);
+    }
+
     $bug->delete();
 
     return redirect()->route('projects.bugs.index', $bug->project_id)->with('success', 'Bug deleted successfully.');
   }
-
 }
