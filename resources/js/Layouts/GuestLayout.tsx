@@ -1,5 +1,10 @@
 import { AppLayout } from '@/Layouts/AppLayout';
+import { Stack } from '@mantine/core';
 
 export const GuestLayout = (props) => {
-  return <AppLayout pageTitle={props.pageTitle}>{props.children}</AppLayout>;
+  return (
+    <AppLayout title={props.title}>
+      <Stack flex={1}>{props.children}</Stack>
+    </AppLayout>
+  );
 };
