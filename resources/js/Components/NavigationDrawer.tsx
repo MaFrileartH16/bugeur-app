@@ -20,14 +20,21 @@ export const NavigationDrawer = () => {
           <Button
             variant="light"
             fullWidth
-            onClick={() => router.get(route('dashboard'))} // Navigasi langsung ke Dashboard
+            onClick={() => router.get(route('dashboard'))}
           >
             Dashboard
           </Button>
           <Button
             variant="light"
             fullWidth
-            onClick={() => router.get(route('projects.index'))} // Navigasi langsung ke Projects
+            onClick={() => router.get(route('users.index'))}
+          >
+            Users
+          </Button>
+          <Button
+            variant="light"
+            fullWidth
+            onClick={() => router.get(route('projects.index'))}
           >
             Projects
           </Button>

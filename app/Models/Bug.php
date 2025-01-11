@@ -11,8 +11,6 @@ class Bug extends Model
 {
   use HasFactory;
 
-  protected $primaryKey = 'bug_id';
-
   protected $fillable = [
     'project_id',
     'title',

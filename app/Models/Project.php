@@ -12,12 +12,7 @@ class Project extends Model
 {
   use HasFactory;
 
-  public $incrementing = false;
-  protected $primaryKey = 'project_id';
-  protected $keyType = 'string';
-
   protected $fillable = [
-    'project_id',
     'manager_id',
     'title',
   ];
