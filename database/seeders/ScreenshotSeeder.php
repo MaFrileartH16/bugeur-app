@@ -12,6 +12,6 @@ class ScreenshotSeeder extends Seeder
    */
   public function run(): void
   {
-    Screenshot::factory(4)->create();
+    Screenshot::factory(16)->create();
   }
 }
