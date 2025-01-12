@@ -12,6 +12,20 @@ class UserSeeder extends Seeder
    */
   public function run(): void
   {
-    User::factory(16)->create();
+    if (!User::where('user_type', 'admin')->exists()) {
+      User::factory()->create([
+        'full_name' => 'Admin',
+        'username' => 'admin',
+        'email' => 'admin@bugeur.id',
+        'user_type' => 'admin',
+      ]);
+    }
+
+    $roles = ['project_manager', 'developer', 'tester', 'designer'];
+    foreach ($roles as $role) {
+      User::factory(4)->create([
+        'user_type' => $role,
+      ]);
+    }
   }
 }
