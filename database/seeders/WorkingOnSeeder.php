@@ -15,13 +15,13 @@ class WorkingOnSeeder extends Seeder
   public function run(): void
   {
     if (Project::count() === 0) {
-      Project::factory(16)->create();
+      Project::factory(4)->create();
     }
 
     if (User::where('user_type', 'developer')->count() === 0) {
-      User::factory(16)->create(['user_type' => 'developer']);
+      User::factory(4)->create(['user_type' => 'developer']);
     }
 
-    WorkingOnFactory::new()->count(16)->create();
+    WorkingOnFactory::new()->count(4)->create();
   }
 }
