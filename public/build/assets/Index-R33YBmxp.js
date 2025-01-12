@@ -1,4 +1,4 @@
-import{j as e,h as t}from"./app-BbeDIDnk.js";import{h,A as j}from"./AuthenticatedLayout-CLo5kxy8.js";import{G as d}from"./Group-sx-wpz45.js";import{T as x}from"./Title-DjX8_R-_.js";import{B as u,b as o}from"./AppLayout-8XI00KJo.js";import{T as r,I as g,a as p}from"./IconTrash-CRQ-Y7-u.js";/**
+import{j as e,h as t}from"./app-CwXZ0I_k.js";import{h,A as j}from"./AuthenticatedLayout-75b7ClUc.js";import{G as d}from"./Group-BpU2ioX9.js";import{T as x}from"./Title-0k7W6g11.js";import{B as u,b as o}from"./AppLayout-DcDpKpJS.js";import{T as r,I as g,a as p}from"./IconTrash-BTQs4wRU.js";/**
  * @license @tabler/icons-react v3.28.1 - MIT
  *
  * This source code is licensed under the MIT license.
