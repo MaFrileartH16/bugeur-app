@@ -1,1 +1,0 @@
-import{j as a}from"./app-CwXZ0I_k.js";import{A as r}from"./AuthenticatedLayout-75b7ClUc.js";import"./AppLayout-DcDpKpJS.js";const i=t=>a.jsx(r,{title:t.title,children:"adsasdasd"});export{i as default};
