@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Project;
 use App\Models\User;
-use Database\Factories\WorkingOnFactory;
+use App\Models\WorkingOn;
 use Illuminate\Database\Seeder;
 
 class WorkingOnSeeder extends Seeder
@@ -14,14 +14,31 @@ class WorkingOnSeeder extends Seeder
    */
   public function run(): void
   {
-    if (Project::count() === 0) {
-      Project::factory(16)->create();
-    }
+    $projects = Project::all();
 
-    if (User::where('user_type', 'developer')->count() === 0) {
-      User::factory(16)->create(['user_type' => 'developer']);
-    }
+    $projects->each(function ($project) {
+      $roles = ['developer', 'quality_assurance'];
 
-    WorkingOnFactory::new()->count(16)->create();
+      foreach ($roles as $role) {
+        $users = User::where('role', $role)
+          ->whereDoesntHave('workingOn', function ($query) use ($project) {
+            $query->where('project_id', $project->id);
+          })
+          ->inRandomOrder()
+          ->take(rand(1, 2))
+          ->get();
+
+        if ($users->isEmpty()) {
+          $users = User::factory(rand(1, 2))->create(['role' => $role]);
+        }
+
+        $users->each(function ($user) use ($project) {
+          WorkingOn::factory()->create([
+            'project_id' => $project->id,
+            'user_id' => $user->id,
+          ]);
+        });
+      }
+    });
   }
 }

@@ -1,11 +1,8 @@
 <?php
 
-use App\Http\Controllers\BugController;
-use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::redirect('/', '/projects');
+Route::redirect('/', '/login');
 
 //Route::get('/', function () {
 //  return Inertia::render('Welcome', [
@@ -22,9 +19,10 @@ Route::redirect('/', '/projects');
 //  ]);
 //})->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::resource('users', UserController::class);
-Route::resource('projects', ProjectController::class);
-Route::resource('projects.bugs', BugController::class);
+
+//Route::resource('users', UserController::class);
+//Route::resource('projects', ProjectController::class);
+//Route::resource('projects.bugs', BugController::class);
 
 //Route::middleware('auth')->group(function () {
 //  Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

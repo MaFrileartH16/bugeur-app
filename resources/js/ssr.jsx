@@ -1,13 +1,14 @@
-import {MantineProvider} from '@mantine/core';
+import { MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
 
-import {createInertiaApp} from '@inertiajs/react';
+import { theme } from '@/theme.js';
+import { createInertiaApp } from '@inertiajs/react';
 import createServer from '@inertiajs/react/server';
 import '@mantine/dates/styles.css';
-import {Notifications} from '@mantine/notifications';
-import {resolvePageComponent} from 'laravel-vite-plugin/inertia-helpers';
+import { Notifications } from '@mantine/notifications';
+import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import ReactDOMServer from 'react-dom/server';
-import {route} from '../../vendor/tightenco/ziggy';
+import { route } from '../../vendor/tightenco/ziggy';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -21,7 +22,7 @@ createServer((page) =>
         `./Pages/${name}.jsx`,
         import.meta.glob('./Pages/**/*.jsx'),
       ),
-    setup: ({App, props}) => {
+    setup: ({ App, props }) => {
       /* eslint-disable */
       // @ts-expect-error
       global.route = (name, params, absolute) =>
@@ -32,8 +33,8 @@ createServer((page) =>
       /* eslint-enable */
 
       return (
-        <MantineProvider>
-          <Notifications position="top-center"/>
+        <MantineProvider theme={theme}>
+          <Notifications position="top-center" />
 
           <App {...props} />
         </MantineProvider>

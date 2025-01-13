@@ -1,6 +1,7 @@
 import '../css/app.css';
 import './bootstrap';
 
+import { theme } from '@/theme.js';
 import { createInertiaApp } from '@inertiajs/react';
 import { MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
@@ -20,7 +21,7 @@ createInertiaApp({
     ),
   setup({ el, App, props }) {
     const RootApp = (
-      <MantineProvider>
+      <MantineProvider theme={theme}>
         <Notifications position="top-center" />
 
         <App {...props} />

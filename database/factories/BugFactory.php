@@ -23,13 +23,11 @@ class BugFactory extends Factory
   {
     return [
       'project_id' => Project::inRandomOrder()->value('id'),
-      'title' => $this->faker->sentence(1),
-      'assignee_id' => User::inRandomOrder()->value('id') ?? User::factory()->create(['user_type' => 'developer'])->id,
-      'status' => $this->faker->randomElement(['open', 'in_progress', 'resolved', 'closed']),
-      'description' => $this->faker->paragraph,
-      'creator_id' => User::inRandomOrder()->value('id') ?? User::factory()->create(['user_type' => 'tester'])->id,
-      'deadline' => $this->faker->dateTimeBetween('now', '+1 month'),
-      'bug_type' => $this->faker->randomElement(['critical', 'major', 'minor']),
+      'creator_id' => User::where('role', 'quality_assurance')->inRandomOrder()->value('id'),
+      'assignee_id' => User::where('role', 'developer')->inRandomOrder()->value('id'),
+      'title' => $this->faker->sentence(),
+      'description' => $this->faker->paragraph(),
+      'status' => $this->faker->randomElement(['in_review', 'open', 'in_progress', 'resolved', 'closed']),
     ];
   }
 }

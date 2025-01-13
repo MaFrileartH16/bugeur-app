@@ -2,8 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Project;
-use App\Models\User;
 use App\Models\WorkingOn;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -20,10 +18,7 @@ class WorkingOnFactory extends Factory
   public function definition(): array
   {
     return [
-      'project_id' => Project::inRandomOrder()->value('id')
-        ?? Project::factory()->create()->id,
-      'user_id' => User::where('user_type', 'developer')->inRandomOrder()->value('id')
-        ?? User::factory()->create(['user_type' => 'developer'])->id,
+      'assigned_at' => now(),
     ];
   }
 }

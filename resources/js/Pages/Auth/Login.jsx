@@ -3,11 +3,13 @@ import { useForm } from '@inertiajs/react';
 import {
   Button,
   Center,
+  Container,
   PasswordInput,
-  Stack,
   TextInput,
   Title,
 } from '@mantine/core';
+import { IconBug } from '@tabler/icons-react';
+import { Text } from 'recharts';
 
 const Login = (props) => {
   const { data, setData, post, processing, errors, reset } = useForm({
@@ -28,8 +30,11 @@ const Login = (props) => {
     <form onSubmit={submit}>
       <GuestLayout title={props.title}>
         <Center flex={1}>
-          <Stack>
+          <Container size="xs" w="100%">
+            <IconBug size={48} />
+
             <Title order={1}>Login</Title>
+            <Text>asdasdasd</Text>
 
             <TextInput
               label="Email Address"
@@ -48,10 +53,10 @@ const Login = (props) => {
               error={errors.password}
             />
 
-            <Button type="submit" color="blue" loading={processing}>
+            <Button type="submit" loading={processing}>
               Login
             </Button>
-          </Stack>
+          </Container>
         </Center>
       </GuestLayout>
     </form>

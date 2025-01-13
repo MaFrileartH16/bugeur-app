@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
 
 class UserFactory extends Factory
 {
@@ -12,13 +11,14 @@ class UserFactory extends Factory
 
   public function definition(): array
   {
+    $fullName = $this->faker->firstName() . ' ' . $this->faker->lastName();
+    $email = strtolower(str_replace(' ', '.', $fullName)) . '@bugeur.id';
+
     return [
-      'full_name' => $this->faker->name(),
-      'username' => $this->faker->unique()->userName(),
-      'email' => $this->faker->unique()->safeEmail(),
-      'user_type' => $this->faker->randomElement(['admin', 'project_manager', 'developer', 'tester', 'designer']),
-      'avatar' => $this->faker->imageUrl(200, 200, 'people'),
-      'password' => Hash::make('password'),
+      'full_name' => $fullName,
+      'email' => $email,
+      'role' => $this->faker->randomElement(['admin', 'project_manager', 'developer', 'quality_assurance']),
+      'password' => $email,
 //      'remember_token' => Str::random(10),
     ];
   }
