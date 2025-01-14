@@ -1,43 +1,49 @@
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { ActionIcon, Button, Drawer, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconMenu4 } from '@tabler/icons-react';
+import {
+  IconDashboard,
+  IconFolders,
+  IconMenu4,
+  IconUsers,
+} from '@tabler/icons-react';
 
 export const NavigationDrawer = () => {
   const [opened, { open, close }] = useDisclosure(false);
+  const { url } = usePage();
+
+  const basePath = url.split('/')[1];
+
+  const menuItems = [
+    { label: 'Dashboard', route: 'dashboard', icon: <IconDashboard /> },
+    { label: 'User List', route: 'users.index', icon: <IconUsers /> },
+    { label: 'Project List', route: 'projects.index', icon: <IconFolders /> },
+  ];
 
   return (
     <>
-      {/* Drawer */}
       <Drawer opened={opened} onClose={close} size="xs">
         <Stack spacing="md">
-          <Button
-            color="macaroni"
-            variant="filled"
-            fullWidth
-            onClick={() => router.get(route('dashboard'))}
-          >
-            Dashboard
-          </Button>
-          <Button
-            variant="light"
-            fullWidth
-            onClick={() => router.get(route('users.index'))}
-          >
-            Users
-          </Button>
-          <Button
-            variant="light"
-            fullWidth
-            onClick={() => router.get(route('projects.index'))}
-          >
-            Projects
-          </Button>
+          {menuItems.map((item, index) => {
+            const routeBase = item.route.split('.')[0];
+
+            return (
+              <Button
+                key={index}
+                leftSection={item.icon} // Dynamically add the icon
+                variant={basePath === routeBase ? 'filled' : 'subtle'}
+                fullWidth
+                display="flex"
+                onClick={() => router.get(route(item.route))}
+              >
+                {item.label}
+              </Button>
+            );
+          })}
         </Stack>
       </Drawer>
 
-      {/* Open Drawer Button */}
-      <ActionIcon onClick={open} variant="light" size={48}>
+      <ActionIcon onClick={open} variant="light">
         <IconMenu4 size={24} />
       </ActionIcon>
     </>

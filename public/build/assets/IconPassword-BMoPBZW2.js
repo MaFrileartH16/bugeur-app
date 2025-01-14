@@ -1,4 +1,4 @@
-import{c as a}from"./AppLayout-DlzvtWaR.js";/**
+import{c as a}from"./AppLayout-iONTU9Cg.js";/**
  * @license @tabler/icons-react v3.28.1 - MIT
  *
  * This source code is licensed under the MIT license.

@@ -1,5 +1,11 @@
 import { generateColors } from '@mantine/colors-generator';
-import { Button, createTheme, PasswordInput, TextInput } from '@mantine/core';
+import {
+  ActionIcon,
+  Button,
+  createTheme,
+  PasswordInput,
+  TextInput,
+} from '@mantine/core';
 
 export const theme = createTheme({
   colors: {
@@ -75,6 +81,11 @@ export const theme = createTheme({
         },
         input: { height: 48 },
         error: { marginTop: 8 },
+      },
+    }),
+    ActionIcon: ActionIcon.extend({
+      defaultProps: {
+        size: 48,
       },
     }),
   },

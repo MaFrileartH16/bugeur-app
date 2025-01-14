@@ -9,7 +9,7 @@ export const Header = (props) => {
       <Flex justify={props.user ? 'space-between' : 'center'} py={16}>
         {props.user && <NavigationDrawer />}
 
-        <ActionIcon size={48} variant="transparent" color="macaroni">
+        <ActionIcon size={48} variant="transparent">
           <IconBug size={48} />
         </ActionIcon>
 

@@ -17,12 +17,13 @@ import {
 } from '@tabler/icons-react';
 
 const Login = (props) => {
+  console.log(props);
+
   const form = useForm({
     email: '',
     password: '',
   });
 
-  // Client-side validation
   const validateField = (field, value) => {
     switch (field) {
       case 'email':
@@ -69,7 +70,7 @@ const Login = (props) => {
 
   return (
     <form onSubmit={submit}>
-      <AppLayout title={props.title}>
+      <AppLayout title={props.title} notification={props.notification}>
         <Center flex={1}>
           <Container flex={1} size="xs">
             <Title order={1}>Login to account</Title>
@@ -84,7 +85,6 @@ const Login = (props) => {
                 error={form.errors.email}
               />
 
-              {/* Password Field */}
               <PasswordInput
                 leftSection={<IconPassword />}
                 label="Password"
@@ -94,7 +94,7 @@ const Login = (props) => {
                 error={form.errors.password}
               />
             </Stack>
-            {/* Button is disabled if fields are empty or there are errors */}
+
             <Button
               fullWidth
               type="submit"
