@@ -6,13 +6,14 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class UserController extends Controller
 {
   /**
    * Display a listing of the users.
    */
-  public function index()
+  public function index(): Response
   {
     $users = User::all();
 
@@ -21,6 +22,7 @@ class UserController extends Controller
       'users' => $users,
     ]);
   }
+
 
   /**
    * Store a newly created user in storage.

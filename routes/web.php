@@ -29,7 +29,8 @@ Route::resource('projects', ProjectController::class);
 //Route::resource('projects.bugs', BugController::class);
 
 Route::middleware('auth')->group(function () {
-  Route::resource('profile', ProfileController::class);
+  Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
+  Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
 require __DIR__ . '/auth.php';

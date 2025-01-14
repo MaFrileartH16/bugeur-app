@@ -16,8 +16,8 @@ export const NavigationDrawer = () => {
 
   const menuItems = [
     { label: 'Dashboard', route: 'dashboard', icon: <IconDashboard /> },
-    { label: 'User List', route: 'users.index', icon: <IconUsers /> },
-    { label: 'Project List', route: 'projects.index', icon: <IconFolders /> },
+    { label: 'Users', route: 'users.index', icon: <IconUsers /> },
+    { label: 'Projects', route: 'projects.index', icon: <IconFolders /> },
   ];
 
   return (

@@ -68,7 +68,7 @@ const EditProfile = (props) => {
     <form onSubmit={handleSubmit}>
       <AppLayout title={props.title} user={user}>
         <Container flex={1} size="xl" w="100%">
-          <Title my={32}>{props.title || 'Edit Profile'}</Title>
+          <Title my={32}>{props.title}</Title>
 
           <Stack my={32}>
             <TextInput

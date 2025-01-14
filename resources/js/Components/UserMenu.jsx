@@ -1,6 +1,6 @@
 import { router } from '@inertiajs/react';
 import { Avatar, Menu } from '@mantine/core';
-import { IconIdBadge2, IconLogout2 } from '@tabler/icons-react';
+import { IconId, IconLogout2 } from '@tabler/icons-react';
 
 export const UserMenu = ({ user }) => {
   const getInitials = (name) => {
@@ -13,9 +13,9 @@ export const UserMenu = ({ user }) => {
 
   const menuItems = [
     {
-      label: 'My Profile',
+      label: 'Profile',
       action: () => router.get(route('profile.edit', user)),
-      icon: <IconIdBadge2 />,
+      icon: <IconId />,
     },
     {
       label: 'Logout',
