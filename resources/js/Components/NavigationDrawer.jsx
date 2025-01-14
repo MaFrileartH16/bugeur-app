@@ -9,16 +9,11 @@ export const NavigationDrawer = () => {
   return (
     <>
       {/* Drawer */}
-      <Drawer
-        opened={opened}
-        onClose={close}
-        title="Navigation"
-        padding="md"
-        size="sm"
-      >
+      <Drawer opened={opened} onClose={close} size="xs">
         <Stack spacing="md">
           <Button
-            variant="light"
+            color="macaroni"
+            variant="filled"
             fullWidth
             onClick={() => router.get(route('dashboard'))}
           >
@@ -42,7 +37,7 @@ export const NavigationDrawer = () => {
       </Drawer>
 
       {/* Open Drawer Button */}
-      <ActionIcon onClick={open}>
+      <ActionIcon onClick={open} variant="light" size={48}>
         <IconMenu4 size={24} />
       </ActionIcon>
     </>

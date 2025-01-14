@@ -17,6 +17,7 @@ class UserSeeder extends Seeder
         'full_name' => 'Admin',
         'email' => 'admin@bugeur.id',
         'role' => 'admin',
+        'password' => 'admin@bugeur.id',
       ]);
     }
 

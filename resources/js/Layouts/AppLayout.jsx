@@ -1,4 +1,5 @@
 import { Footer } from '@/Components/Footer';
+import { Header } from '@/Components/Header.jsx';
 import { Head } from '@inertiajs/react';
 import { Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
@@ -23,6 +24,8 @@ export const AppLayout = (props) => {
       <Head title={props.title} />
 
       <Stack gap={0} mih="100vh">
+        <Header user={props.user} />
+
         {props.children}
 
         <Footer />

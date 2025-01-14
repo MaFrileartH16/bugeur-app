@@ -1,5 +1,5 @@
 import { generateColors } from '@mantine/colors-generator';
-import { Button, createTheme, TextInput } from '@mantine/core';
+import { Button, createTheme, PasswordInput, TextInput } from '@mantine/core';
 
 export const theme = createTheme({
   colors: {
@@ -19,9 +19,8 @@ export const theme = createTheme({
       h6: { fontSize: '14px', fontWeight: '400', lineHeight: '20px' },
     },
   },
-
-  white: '#d9d9d9',
-  black: '#262626',
+  white: '#f2f2f2',
+  black: '#0d0d0d',
   // primaryShade: { light: 5, dark: 7 },
   autoContrast: true,
   radius: {
@@ -41,8 +40,8 @@ export const theme = createTheme({
     xxl: { fontSize: '24px', fontWeight: '600', lineHeight: '32px' },
   },
   defaultGradient: {
-    from: 'midnight',
-    to: 'crayola',
+    from: 'crystal',
+    to: 'macaroni',
   },
   components: {
     Button: Button.extend({
@@ -57,7 +56,25 @@ export const theme = createTheme({
         section: { width: 24, margin: '0 16px' },
         wrapper: { marginBottom: 0 },
         label: { marginBottom: 8 },
-        input: { padding: '0 56px', height: 48 },
+        input: {
+          padding: '0 16px 0px 56px',
+          height: 48,
+          backgroundColor: '#f2f2f2',
+        },
+        error: { marginTop: 8 },
+      },
+    }),
+    PasswordInput: PasswordInput.extend({
+      styles: {
+        section: { width: 24, margin: '0 16px' },
+        wrapper: { marginBottom: 0 },
+        label: { marginBottom: 8 },
+        innerInput: {
+          padding: '0 56px',
+          backgroundColor: '#f2f2f2',
+        },
+        input: { height: 48 },
+        error: { marginTop: 8 },
       },
     }),
   },

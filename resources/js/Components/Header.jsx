@@ -1,14 +1,19 @@
 import { NavigationDrawer } from '@/Components/NavigationDrawer';
 import { UserMenu } from '@/Components/UserMenu';
-import { Container, Flex } from '@mantine/core';
+import { ActionIcon, Container, Flex } from '@mantine/core';
+import { IconBug } from '@tabler/icons-react';
 
-export const Header = () => {
+export const Header = (props) => {
   return (
-    <Container py={16} size="lg" w="100%">
-      <Flex justify="space-between">
-        <NavigationDrawer />
+    <Container w="100%" size="xl">
+      <Flex justify={props.user ? 'space-between' : 'center'} py={16}>
+        {props.user && <NavigationDrawer />}
 
-        <UserMenu />
+        <ActionIcon size={48} variant="transparent" color="macaroni">
+          <IconBug size={48} />
+        </ActionIcon>
+
+        {props.user && <UserMenu user={props.user} />}
       </Flex>
     </Container>
   );

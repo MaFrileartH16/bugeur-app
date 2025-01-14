@@ -67,6 +67,36 @@ class User extends Authenticatable
     $this->attributes['password'] = Hash::make($password);
   }
 
+  public function setFullNameAttribute(string $value): void
+  {
+    // Remove extra spaces and capitalize each word
+    $formattedName = collect(explode(' ', trim($value)))
+      ->filter() // Remove empty strings caused by extra spaces
+      ->map(fn($word) => ucfirst(strtolower($word))) // Capitalize each word
+      ->implode(' ');
+
+    $this->attributes['full_name'] = $formattedName;
+  }
+
+  public function getFullNameAttribute(): string
+  {
+    // Ensure consistent formatting when retrieving the name
+    $formattedName = collect(explode(' ', trim($this->attributes['full_name'])))
+      ->filter()
+      ->map(fn($word) => ucfirst(strtolower($word)))
+      ->implode(' ');
+
+    return $formattedName;
+  }
+
+  public function getRoleAttribute(): string
+  {
+    // Replace underscores with spaces and capitalize each word
+    return collect(explode('_', $this->attributes['role']))
+      ->map(fn($word) => ucfirst($word)) // Capitalize each word
+      ->implode(' ');
+  }
+
   /**
    * Get the attributes that should be cast.
    *
@@ -79,4 +109,5 @@ class User extends Authenticatable
       'password' => 'hashed',
     ];
   }
+
 }

@@ -1,64 +1,114 @@
-import { GuestLayout } from '@/Layouts/GuestLayout';
+import { AppLayout } from '@/Layouts/AppLayout.jsx';
 import { useForm } from '@inertiajs/react';
 import {
   Button,
   Center,
   Container,
   PasswordInput,
+  Stack,
   TextInput,
   Title,
 } from '@mantine/core';
-import { IconBug } from '@tabler/icons-react';
-import { Text } from 'recharts';
+import {
+  IconLock,
+  IconLockOpen2,
+  IconMail,
+  IconPassword,
+} from '@tabler/icons-react';
 
 const Login = (props) => {
-  const { data, setData, post, processing, errors, reset } = useForm({
+  const form = useForm({
     email: '',
     password: '',
   });
 
+  // Client-side validation
+  const validateField = (field, value) => {
+    switch (field) {
+      case 'email':
+        if (!value) return 'Email is required.';
+        if (!/\S+@\S+\.\S+/.test(value))
+          return 'Please enter a valid email address.';
+        return null;
+
+      case 'password':
+        if (!value) return 'Password is required.';
+        if (value.length < 6) return 'Password must be at least 6 characters.';
+        return null;
+
+      default:
+        return null;
+    }
+  };
+
+  const handleChange = (field) => (e) => {
+    const value = e.target.value;
+    form.setData(field, value);
+
+    const error = validateField(field, value);
+    if (error) {
+      form.setError(field, error);
+    } else {
+      form.clearErrors(field);
+    }
+  };
+
   const submit = (e) => {
     e.preventDefault();
-    post(route('login'), {
-      onFinish: () => reset('password'),
+
+    form.post(route('login'), {
+      onFinish: () => form.clearErrors('password'),
     });
   };
 
-  console.log(data);
+  const areFieldsFilled = Object.values(form.data).every(
+    (value) => value.trim() !== '',
+  );
+
+  const hasErrors = Object.keys(form.errors).length > 0;
 
   return (
     <form onSubmit={submit}>
-      <GuestLayout title={props.title}>
+      <AppLayout title={props.title}>
         <Center flex={1}>
-          <Container size="xs" w="100%">
-            <IconBug size={48} />
+          <Container flex={1} size="xs">
+            <Title order={1}>Login to account</Title>
 
-            <Title order={1}>Login</Title>
-            <Text>asdasdasd</Text>
+            <Stack my={32}>
+              <TextInput
+                leftSection={<IconMail />}
+                label="Email Address"
+                placeholder="username@bugeur.id"
+                value={form.data.email}
+                onChange={handleChange('email')}
+                error={form.errors.email}
+              />
 
-            <TextInput
-              label="Email Address"
-              placeholder="Enter your email"
-              value={data.email}
-              onChange={(e) => setData('email', e.target.value)}
-              error={errors.email}
-            />
-
-            {/* Password Field */}
-            <PasswordInput
-              label="Password"
-              placeholder="Enter your password"
-              value={data.password}
-              onChange={(e) => setData('password', e.target.value)}
-              error={errors.password}
-            />
-
-            <Button type="submit" loading={processing}>
+              {/* Password Field */}
+              <PasswordInput
+                leftSection={<IconPassword />}
+                label="Password"
+                placeholder="********"
+                value={form.data.password}
+                onChange={handleChange('password')}
+                error={form.errors.password}
+              />
+            </Stack>
+            {/* Button is disabled if fields are empty or there are errors */}
+            <Button
+              fullWidth
+              type="submit"
+              leftSection={
+                !areFieldsFilled || hasErrors ? <IconLock /> : <IconLockOpen2 />
+              }
+              loading={form.processing}
+              disabled={!areFieldsFilled || hasErrors}
+            >
               Login
             </Button>
           </Container>
         </Center>
-      </GuestLayout>
+      </AppLayout>
     </form>
   );
 };
