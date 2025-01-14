@@ -1,4 +1,4 @@
-import { AuthenticatedLayout } from '@/Layouts/AuthenticatedLayout';
+import { AppLayout } from '@/Layouts/AppLayout';
 import { router, useForm } from '@inertiajs/react';
 import {
   Button,
@@ -38,7 +38,7 @@ const Create = ({ project, users }) => {
   };
 
   return (
-    <AuthenticatedLayout title={`Add Bug to ${project.title}`}>
+    <AppLayout title={`Add Bug to ${project.title}`}>
       <Title order={2} mb="md">
         Add Bug to {project.title}
       </Title>
@@ -142,7 +142,7 @@ const Create = ({ project, users }) => {
           </Group>
         </Stack>
       </form>
-    </AuthenticatedLayout>
+    </AppLayout>
   );
 };
 

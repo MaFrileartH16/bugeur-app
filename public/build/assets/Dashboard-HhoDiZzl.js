@@ -1,0 +1,1 @@
+import{j as e}from"./app-Drlvy6IS.js";import{A as r,C as s,T as i}from"./AppLayout-DlzvtWaR.js";const n=t=>e.jsx(r,{title:t.title,user:t.auth.user,children:e.jsx(s,{flex:1,size:"xl",children:e.jsx(i,{mb:32,children:t.title})})});export{n as default};

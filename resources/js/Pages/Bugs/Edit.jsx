@@ -1,4 +1,4 @@
-import { AuthenticatedLayout } from '@/Layouts/AuthenticatedLayout';
+import { AppLayout } from '@/Layouts/AppLayout';
 import { router, useForm } from '@inertiajs/react';
 import {
   Button,
@@ -37,7 +37,7 @@ const Edit = ({ project, bug, users }) => {
   };
 
   return (
-    <AuthenticatedLayout title={`Edit Bug in ${project.title}`}>
+    <AppLayout title={`Edit Bug in ${project.title}`}>
       <Title order={2} mb="md">
         Edit Bug in {project.title}
       </Title>
@@ -146,7 +146,7 @@ const Edit = ({ project, bug, users }) => {
           </Group>
         </Stack>
       </form>
-    </AuthenticatedLayout>
+    </AppLayout>
   );
 };
 

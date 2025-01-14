@@ -1,4 +1,4 @@
-import { AuthenticatedLayout } from '@/Layouts/AuthenticatedLayout';
+import { AppLayout } from '@/Layouts/AppLayout';
 import { router } from '@inertiajs/react';
 import { ActionIcon, Button, Group, Table, Title } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
@@ -23,7 +23,7 @@ const Index = (props) => {
   };
 
   return (
-    <AuthenticatedLayout title="Users">
+    <AppLayout title="Users">
       <Group position="apart" mb="md">
         <Title order={2}>Users List</Title>
         <Button onClick={handleAddUser} color="blue">
@@ -67,7 +67,7 @@ const Index = (props) => {
           ))}
         </Table.Tbody>
       </Table>
-    </AuthenticatedLayout>
+    </AppLayout>
   );
 };
 

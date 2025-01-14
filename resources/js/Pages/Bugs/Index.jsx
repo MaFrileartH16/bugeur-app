@@ -1,4 +1,4 @@
-import { AuthenticatedLayout } from '@/Layouts/AuthenticatedLayout';
+import { AppLayout } from '@/Layouts/AppLayout';
 import { router } from '@inertiajs/react';
 import { ActionIcon, Button, Group, Image, Table, Title } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
@@ -25,7 +25,7 @@ const BugsIndex = ({ project, bugs }) => {
   };
 
   return (
-    <AuthenticatedLayout title={`Bugs for ${project.title}`}>
+    <AppLayout title={`Bugs for ${project.title}`}>
       <Group position="apart" mb="md">
         <Title order={2}>Bugs for {project.title}</Title>
         <Button onClick={handleAddBug} color="blue">
@@ -94,7 +94,7 @@ const BugsIndex = ({ project, bugs }) => {
           ))}
         </Table.Tbody>
       </Table>
-    </AuthenticatedLayout>
+    </AppLayout>
   );
 };
 

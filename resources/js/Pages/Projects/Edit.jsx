@@ -1,4 +1,4 @@
-import { AuthenticatedLayout } from '@/Layouts/AuthenticatedLayout';
+import { AppLayout } from '@/Layouts/AppLayout';
 import { router, useForm } from '@inertiajs/react';
 import { Button, Group, Select, Stack, TextInput, Title } from '@mantine/core';
 
@@ -18,7 +18,7 @@ const Edit = ({ project, managers }) => {
   };
 
   return (
-    <AuthenticatedLayout title="Edit Project">
+    <AppLayout title="Edit Project">
       <Title order={2} mb="md">
         Edit Project
       </Title>
@@ -57,7 +57,7 @@ const Edit = ({ project, managers }) => {
           </Group>
         </Stack>
       </form>
-    </AuthenticatedLayout>
+    </AppLayout>
   );
 };
 
