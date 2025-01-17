@@ -23,7 +23,7 @@ createInertiaApp({
   setup({ el, App, props }) {
     const RootApp = (
       <MantineProvider theme={theme}>
-        <Notifications position="top-center" />
+        <Notifications position="top-center" limit={1} />
 
         <App {...props} />
       </MantineProvider>

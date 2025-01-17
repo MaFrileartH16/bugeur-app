@@ -3,48 +3,73 @@ import { ActionIcon, Button, Drawer, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   IconDashboard,
-  IconFolders,
+  IconFolder,
   IconMenu4,
-  IconUsers,
+  IconUser,
+  IconX,
 } from '@tabler/icons-react';
 
 export const NavigationDrawer = () => {
   const [opened, { open, close }] = useDisclosure(false);
-  const { url } = usePage();
+  const { url, props } = usePage();
+  const { auth } = props;
 
-  const basePath = url.split('/')[1];
+  // Extract base path from the URL
+  const basePath = url.split('?')[0].split('/')[1]; // Only take the first segment after "/"
 
   const menuItems = [
-    { label: 'Dashboard', route: 'dashboard', icon: <IconDashboard /> },
-    { label: 'Users', route: 'users.index', icon: <IconUsers /> },
-    { label: 'Projects', route: 'projects.index', icon: <IconFolders /> },
+    { label: 'Dashboard', route: 'dashboard', leftSection: <IconDashboard /> },
+    ...(auth.user.role === 'Admin'
+      ? [{ label: 'Users', route: 'users.index', leftSection: <IconUser /> }]
+      : []),
+    { label: 'Projects', route: 'projects.index', leftSection: <IconFolder /> },
   ];
 
   return (
     <>
-      <Drawer opened={opened} onClose={close} size="xs">
-        <Stack spacing="md">
-          {menuItems.map((item, index) => {
-            const routeBase = item.route.split('.')[0];
+      <Drawer.Root opened={opened} onClose={close} size="xs">
+        <Drawer.Overlay />
 
-            return (
-              <Button
-                key={index}
-                leftSection={item.icon} // Dynamically add the icon
-                variant={basePath === routeBase ? 'filled' : 'subtle'}
-                fullWidth
-                display="flex"
-                onClick={() => router.get(route(item.route))}
-              >
-                {item.label}
-              </Button>
-            );
-          })}
-        </Stack>
-      </Drawer>
+        <Drawer.Content>
+          <Drawer.Header p={16}>
+            <ActionIcon onClick={close} variant="subtle" color="ghost">
+              <IconX />
+            </ActionIcon>
+          </Drawer.Header>
 
-      <ActionIcon onClick={open} variant="light">
-        <IconMenu4 size={24} />
+          <Drawer.Body>
+            <Stack gap={16}>
+              {menuItems.map((item, index) => {
+                const routeBase = item.route.split('.')[0];
+
+                return (
+                  <Button
+                    key={index}
+                    leftSection={item.leftSection}
+                    variant={basePath === routeBase ? 'filled' : 'subtle'} // Compare base path
+                    fullWidth
+                    display="flex"
+                    onClick={() => {
+                      // Append `page=1` for users.index
+                      if (item.route === 'users.index') {
+                        router.get(route(item.route), { page: 1 });
+                      } else {
+                        router.get(route(item.route));
+                      }
+                      close(); // Close drawer after navigation
+                    }}
+                  >
+                    {item.label}
+                  </Button>
+                );
+              })}
+            </Stack>
+          </Drawer.Body>
+        </Drawer.Content>
+      </Drawer.Root>
+
+      <ActionIcon onClick={open} variant="subtle" color="ghost">
+        <IconMenu4 />
       </ActionIcon>
     </>
   );

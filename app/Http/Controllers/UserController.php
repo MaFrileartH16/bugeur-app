@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -15,35 +16,44 @@ class UserController extends Controller
    */
   public function index(): Response
   {
-    $users = User::all();
+    // Define cache key
+    $cacheKey = 'users_index_page_' . request('page', 1);
 
+    // Retrieve users from cache or database
+    $users = cache()->remember($cacheKey, now()->addMinutes(10), function () {
+      return User::where('role', '!=', 'admin')
+        ->orderBy('full_name', 'asc')
+        ->paginate(16); // Set pagination per page
+    });
+
+    // Return Inertia response
     return Inertia::render('Users/Index', [
       'title' => 'Users',
       'users' => $users,
+      'notification' => session()->pull('notification'),
     ]);
   }
-
 
   /**
    * Store a newly created user in storage.
    */
   public function store(Request $request)
   {
-    $request->validate([
-      'username' => 'required|string|max:255',
-      'email' => 'required|email|unique:users,email',
-      'user_type' => 'required|in:admin,project_manager,developer,tester',
-      'password' => 'required|string|min:8',
-    ]);
-
     User::create([
-      'username' => $request->username,
+      'full_name' => $request->full_name,
       'email' => $request->email,
-      'user_type' => $request->user_type,
+      'role' => $request->role,
       'password' => Hash::make($request->password),
     ]);
 
-    return redirect()->route('users.index')->with('success', 'User created successfully.');
+    // Clear cache for all pages
+    $this->clearCache();
+
+    return redirect()->route('users.index', ['page' => 1])->with('notification', [
+      'status' => 'success',
+      'title' => 'User Created',
+      'message' => 'User created successfully.',
+    ]);
   }
 
   /**
@@ -54,6 +64,19 @@ class UserController extends Controller
     return Inertia::render('Users/Create', [
       'title' => 'Add User',
     ]);
+  }
+
+  /**
+   * Clear cache for all users index pages.
+   */
+  private function clearCache()
+  {
+    // Clear cache for all paginated pages
+    $page = 1;
+    while (Cache::has("users_index_page_$page")) {
+      Cache::forget("users_index_page_$page");
+      $page++;
+    }
   }
 
   /**
@@ -72,15 +95,16 @@ class UserController extends Controller
    */
   public function update(Request $request, User $user)
   {
-    $request->validate([
-      'username' => 'required|string|max:255',
-      'email' => 'required|email|unique:users,email,' . $user->id,
-      'user_type' => 'required|in:admin,project_manager,developer,tester',
+    $user->update($request->only(['full_name', 'email', 'role']));
+
+    // Clear cache for all pages
+    $this->clearCache();
+
+    return redirect()->route('users.index', ['page' => 1])->with('notification', [
+      'status' => 'success',
+      'title' => 'User Updated',
+      'message' => 'User updated successfully.',
     ]);
-
-    $user->update($request->only(['username', 'email', 'user_type']));
-
-    return redirect()->route('users.index')->with('success', 'User updated successfully.');
   }
 
   /**
@@ -90,6 +114,13 @@ class UserController extends Controller
   {
     $user->delete();
 
-    return redirect()->route('users.index')->with('success', 'User deleted successfully.');
+    // Clear cache for all pages
+    $this->clearCache();
+
+    return redirect()->route('users.index', ['page' => 1])->with('notification', [
+      'status' => 'success',
+      'title' => 'User Deleted',
+      'message' => 'User deleted successfully.',
+    ]);
   }
 }

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Project extends Model
@@ -19,5 +20,11 @@ class Project extends Model
   public function manager(): BelongsTo
   {
     return $this->belongsTo(User::class, 'manager_id');
+  }
+
+  public function workingOn(): BelongsToMany
+  {
+    return $this->belongsToMany(User::class, 'working_on', 'project_id', 'user_id')
+      ->withPivot('assigned_at');
   }
 }

@@ -1,88 +1,160 @@
-import { AppLayout } from '@/Layouts/AppLayout';
-import { router, useForm } from '@inertiajs/react';
+import { AppLayout } from '@/Layouts/AppLayout.jsx';
+import { useForm } from '@inertiajs/react';
 import {
   Button,
-  Group,
+  Container,
+  Grid,
   PasswordInput,
   Select,
-  Stack,
   TextInput,
   Title,
 } from '@mantine/core';
+import { IconKey, IconMail, IconPassword, IconUser } from '@tabler/icons-react';
 
-const Create = () => {
-  const { data, setData, post, processing, errors, reset } = useForm({
-    username: '',
+const Create = (props) => {
+  const { user } = props.auth;
+
+  const form = useForm({
+    full_name: '',
     email: '',
-    user_type: '',
+    role: '',
     password: '',
   });
 
+  const validateField = (field, value) => {
+    if (!value) {
+      const formattedField = field
+        .replace('_', ' ')
+        .replace(/^\w/, (c) => c.toUpperCase());
+      return `${formattedField} is required.`;
+    }
+
+    if (field === 'email' && !value.endsWith('@bugeur.id')) {
+      return 'Email must use @bugeur.id.';
+    }
+
+    return null;
+  };
+
+  const handleChange = (field) => (e) => {
+    let value = e.target ? e.target.value : e;
+
+    // Transformasi untuk Full Name dan Email
+    if (field === 'full_name') {
+      value = value
+        .split(' ')
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+        )
+        .join(' ');
+    } else if (field === 'email') {
+      value = value.replace(/\s+/g, '').toLowerCase(); // Hapus spasi dan ubah ke lowercase
+      form.setData('password', value); // Password otomatis mengikuti email
+    }
+
+    form.setData(field, value);
+
+    const error = validateField(field, value);
+    if (error) {
+      form.setError(field, error);
+    } else {
+      form.clearErrors(field);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    post(route('users.store'), {
-      onSuccess: () => reset(), // Reset form setelah sukses
+    form.post(route('users.store'), {
+      onFinish: () => form.reset(),
     });
   };
 
+  const isFormEmpty =
+    !form.data.full_name || !form.data.email || !form.data.role;
+
+  const fields = [
+    {
+      label: 'Full Name',
+      value: form.data.full_name,
+      onChange: handleChange('full_name'),
+      error: form.errors.full_name,
+      placeholder: "Enter the user's full name",
+      leftSection: <IconUser />,
+      component: TextInput,
+    },
+    {
+      label: 'Email Address',
+      value: form.data.email,
+      onChange: handleChange('email'),
+      error: form.errors.email,
+      placeholder: "Enter the user's email address (e.g., username@bugeur.id)",
+      leftSection: <IconMail />,
+      component: TextInput,
+    },
+    {
+      label: 'Role',
+      onChange: handleChange('role'),
+      error: form.errors.role,
+      placeholder: "Choose the user's role",
+      leftSection: <IconKey />,
+      component: Select,
+      data: [
+        { value: 'project_manager', label: 'Project Manager' },
+        { value: 'developer', label: 'Developer' },
+        { value: 'quality_assurance', label: 'Quality Assurance' },
+      ],
+    },
+    {
+      label: 'Password',
+      value: form.data.password,
+      onChange: handleChange('password'),
+      error: form.errors.password,
+      placeholder: 'Password is auto-filled based on email',
+      leftSection: <IconPassword />,
+      component: PasswordInput,
+      readOnly: true, // Field password tidak bisa diubah
+      disabled: true, // Field password dinonaktifkan
+    },
+  ];
+
+  const hasErrors = Object.keys(form.errors).length > 0;
+
   return (
-    <AppLayout title="Add User">
-      <Title order={2} mb="md">
-        Add New User
-      </Title>
-      <form onSubmit={handleSubmit}>
-        <Stack spacing="md">
-          <TextInput
-            label="Username"
-            placeholder="Enter username"
-            value={data.username}
-            onChange={(e) => setData('username', e.target.value)}
-            error={errors.username}
-          />
+    <form onSubmit={handleSubmit}>
+      <AppLayout title={props.title} user={user}>
+        <Container flex={1} size="xl" w="100%" py={32}>
+          <Title mb={32}>{props.title}</Title>
 
-          <TextInput
-            label="Email"
-            placeholder="Enter email"
-            value={data.email}
-            onChange={(e) => setData('email', e.target.value)}
-            error={errors.email}
-          />
+          <Grid gutter={16} justify="flex-end">
+            {fields.map(
+              ({ component: Component, label, ...restField }, index) => (
+                <Grid.Col key={index} span={{ base: 12 }}>
+                  <Grid gutter={{ base: 8, sm: 0 }} align="center">
+                    <Grid.Col span={{ base: 12, sm: 4 }}>
+                      <Title order={5}>{label}</Title>
+                    </Grid.Col>
+                    <Grid.Col span={{ base: 12, sm: 8 }}>
+                      <Component {...restField} />
+                    </Grid.Col>
+                  </Grid>
+                </Grid.Col>
+              ),
+            )}
 
-          <Select
-            label="User Type"
-            placeholder="Select user type"
-            data={[
-              { value: 'project_manager', label: 'Project Manager' },
-              { value: 'developer', label: 'Developer' },
-              { value: 'tester', label: 'Tester' },
-            ]}
-            value={data.user_type}
-            onChange={(value) => setData('user_type', value)}
-            error={errors.user_type}
-          />
-
-          <PasswordInput
-            label="Password"
-            placeholder="Enter password"
-            value={data.password}
-            onChange={(e) => setData('password', e.target.value)}
-            error={errors.password}
-          />
-
-          <Group position="right">
-            <Button type="submit" color="blue" loading={processing}>
-              Save
-            </Button>
-            <Button
-              variant="default"
-              onClick={() => router.get(route('users.index'))} // Kembali ke halaman index
-            >
-              Cancel
-            </Button>
-          </Group>
-        </Stack>
-      </form>
-    </AppLayout>
+            <Grid.Col span={{ base: 12, sm: 8, smOffset: 4 }}>
+              <Button
+                type="submit"
+                fullWidth
+                disabled={form.processing || hasErrors || isFormEmpty}
+                loading={form.processing}
+              >
+                Add User
+              </Button>
+            </Grid.Col>
+          </Grid>
+        </Container>
+      </AppLayout>
+    </form>
   );
 };
 

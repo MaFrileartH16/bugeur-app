@@ -1,9 +1,14 @@
 import { generateColors } from '@mantine/colors-generator';
 import {
   ActionIcon,
+  Avatar,
   Button,
   createTheme,
+  Modal,
+  MultiSelect,
+  Pagination,
   PasswordInput,
+  Select,
   TextInput,
 } from '@mantine/core';
 
@@ -12,6 +17,9 @@ export const theme = createTheme({
     crystal: generateColors('#A8DADC'),
     macaroni: generateColors('#FFB385'),
     ghost: generateColors('#F8F9FA'),
+    magic: generateColors('#B5EAD7'),
+    peach: generateColors('#FFD1BA'),
+    soap: generateColors('#D4D8F0'),
   },
   fontFamily: 'Fredoka, serif',
   primaryColor: 'crystal',
@@ -65,7 +73,6 @@ export const theme = createTheme({
         input: {
           padding: '0 16px 0px 56px',
           height: 48,
-          backgroundColor: '#f2f2f2',
         },
         error: { marginTop: 8 },
       },
@@ -77,15 +84,87 @@ export const theme = createTheme({
         label: { marginBottom: 8 },
         innerInput: {
           padding: '0 56px',
-          backgroundColor: '#f2f2f2',
         },
         input: { height: 48 },
         error: { marginTop: 8 },
       },
     }),
+    Textarea: TextInput.extend({
+      styles: {
+        section: { width: 24, margin: '0 16px' },
+        input: {
+          padding: '12px 16px 12px 56px',
+          height: 96,
+        },
+      },
+    }),
     ActionIcon: ActionIcon.extend({
       defaultProps: {
         size: 48,
+      },
+    }),
+    Select: Select.extend({
+      defaultProps: {
+        clearable: true,
+        checkIconPosition: 'right',
+        comboboxProps: { shadow: 'xl' },
+      },
+      styles: {
+        section: { width: 24, margin: '0 16px' },
+        input: {
+          padding: '0 16px 0px 56px',
+          height: 48,
+        },
+        option: {
+          height: 48,
+          padding: 16,
+        },
+        dropdown: {
+          padding: 0,
+        },
+      },
+    }),
+    Modal: Modal.extend({
+      defaultProps: {
+        withCloseButton: false,
+      },
+    }),
+    Pagination: Pagination.extend({
+      styles: {
+        control: {
+          height: 48,
+          width: 48,
+          borderRadius: 16,
+        },
+      },
+    }),
+    Avatar: Avatar.extend({
+      defaultProps: {
+        radius: 16,
+      },
+    }),
+    MultiSelect: MultiSelect.extend({
+      defaultProps: {
+        clearable: true,
+        searchable: true,
+        checkIconPosition: 'right',
+        hidePickedOptions: true,
+        comboboxProps: { shadow: 'xl' },
+      },
+      styles: {
+        input: {
+          display: 'flex',
+          padding: '10px 16px 10px 56px',
+          minHeight: 48, // Tinggi input
+        },
+        dropdown: {
+          padding: 0,
+        },
+        section: { width: 24, margin: '0 16px' },
+        option: {
+          height: 48,
+          padding: 16,
+        },
       },
     }),
   },

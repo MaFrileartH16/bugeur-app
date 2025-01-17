@@ -15,31 +15,35 @@ import {
   IconMail,
   IconPassword,
 } from '@tabler/icons-react';
+import { useState } from 'react';
 
 const Login = (props) => {
-  console.log(props);
-
   const form = useForm({
     email: '',
     password: '',
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+
   const validateField = (field, value) => {
-    switch (field) {
-      case 'email':
-        if (!value) return 'Email is required.';
-        if (!/\S+@\S+\.\S+/.test(value))
-          return 'Please enter a valid email address.';
-        return null;
+    const validators = {
+      email: {
+        required: 'Email is required.',
+        pattern: /^[a-zA-Z0-9._%+-]+@bugeur\.id$/,
+        patternError: 'Email must use @bugeur.id.',
+      },
+      password: {
+        required: 'Password is required.',
+      },
+    };
 
-      case 'password':
-        if (!value) return 'Password is required.';
-        if (value.length < 6) return 'Password must be at least 6 characters.';
-        return null;
+    const rules = validators[field];
+    if (!rules) return null;
 
-      default:
-        return null;
-    }
+    if (!value) return rules.required;
+    if (rules.pattern && !rules.pattern.test(value)) return rules.patternError;
+
+    return null;
   };
 
   const handleChange = (field) => (e) => {
@@ -47,15 +51,22 @@ const Login = (props) => {
     form.setData(field, value);
 
     const error = validateField(field, value);
-    if (error) {
-      form.setError(field, error);
-    } else {
-      form.clearErrors(field);
-    }
+    error ? form.setError(field, error) : form.clearErrors(field);
   };
 
   const submit = (e) => {
     e.preventDefault();
+
+    const errors = {};
+    Object.keys(form.data).forEach((field) => {
+      const error = validateField(field, form.data[field]);
+      if (error) errors[field] = error;
+    });
+
+    if (Object.keys(errors).length > 0) {
+      form.setErrors(errors);
+      return;
+    }
 
     form.post(route('login'), {
       onFinish: () => form.clearErrors('password'),
@@ -68,31 +79,39 @@ const Login = (props) => {
 
   const hasErrors = Object.keys(form.errors).length > 0;
 
+  const fields = [
+    {
+      label: 'Email Address',
+      value: form.data.email,
+      onChange: handleChange('email'),
+      error: form.errors.email,
+      placeholder: 'username@bugeur.id',
+      leftSection: <IconMail />,
+      component: TextInput,
+    },
+    {
+      label: 'Password',
+      type: showPassword ? 'text' : 'password',
+      value: form.data.password,
+      onChange: handleChange('password'),
+      error: form.errors.password,
+      placeholder: '********',
+      leftSection: <IconPassword />,
+      component: PasswordInput,
+    },
+  ];
+
   return (
     <form onSubmit={submit}>
       <AppLayout title={props.title} notification={props.notification}>
         <Center flex={1}>
           <Container flex={1} size="xs">
-            <Title order={1}>Login to account</Title>
+            <Title order={1}>Login to your account</Title>
 
-            <Stack my={32}>
-              <TextInput
-                leftSection={<IconMail />}
-                label="Email Address"
-                placeholder="username@bugeur.id"
-                value={form.data.email}
-                onChange={handleChange('email')}
-                error={form.errors.email}
-              />
-
-              <PasswordInput
-                leftSection={<IconPassword />}
-                label="Password"
-                placeholder="********"
-                value={form.data.password}
-                onChange={handleChange('password')}
-                error={form.errors.password}
-              />
+            <Stack my={16}>
+              {fields.map(({ component: Component, ...restField }, index) => (
+                <Component key={index} {...restField} />
+              ))}
             </Stack>
 
             <Button

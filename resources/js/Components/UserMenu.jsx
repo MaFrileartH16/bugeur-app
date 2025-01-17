@@ -26,9 +26,15 @@ export const UserMenu = ({ user }) => {
   ];
 
   return (
-    <Menu shadow="md" width={200}>
+    <Menu
+      shadow="xl"
+      width={200}
+      position="bottom-end"
+      withArrow
+      arrowPosition="center"
+    >
       <Menu.Target style={{ cursor: 'pointer' }}>
-        <Avatar color="crystal" size={48} radius={16}>
+        <Avatar color="crystal" size={48}>
           {getInitials(user.full_name)}
         </Avatar>
       </Menu.Target>

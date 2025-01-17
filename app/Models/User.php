@@ -59,7 +59,8 @@ class User extends Authenticatable
 //
   public function workingOn(): BelongsToMany
   {
-    return $this->belongsToMany(Project::class, 'working_on', 'user_id', 'project_id');
+    return $this->belongsToMany(Project::class, 'working_on', 'user_id', 'project_id')
+      ->withPivot('assigned_at');
   }
 
   public function setPasswordAttribute(string $password): void
