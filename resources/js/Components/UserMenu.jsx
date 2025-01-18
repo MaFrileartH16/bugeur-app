@@ -15,35 +15,30 @@ export const UserMenu = ({ user }) => {
     {
       label: 'Profile',
       action: () => router.get(route('profile.edit', user)),
-      icon: <IconId />,
+      leftSection: <IconId />,
+      color: 'ghost',
     },
     {
       label: 'Logout',
       action: () => router.post(route('logout')),
-      icon: <IconLogout2 />,
+      leftSection: <IconLogout2 />,
       color: 'red',
     },
   ];
 
   return (
-    <Menu
-      shadow="xl"
-      width={200}
-      position="bottom-end"
-      withArrow
-      arrowPosition="center"
-    >
+    <Menu shadow="xs" position="bottom-end" withArrow arrowPosition="center">
       <Menu.Target style={{ cursor: 'pointer' }}>
         <Avatar color="crystal" size={48}>
           {getInitials(user.full_name)}
         </Avatar>
       </Menu.Target>
-      <Menu.Dropdown>
+      <Menu.Dropdown p={0}>
         {menuItems.map((item, index) => (
           <Menu.Item
             key={index}
             h={48}
-            leftSection={item.icon}
+            leftSection={item.leftSection}
             onClick={item.action}
             color={item.color || undefined}
           >

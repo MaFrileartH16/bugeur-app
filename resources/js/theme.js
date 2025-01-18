@@ -107,7 +107,9 @@ export const theme = createTheme({
       defaultProps: {
         clearable: true,
         checkIconPosition: 'right',
-        comboboxProps: { shadow: 'xl' },
+        comboboxProps: { shadow: 'xs' },
+        searchable: true,
+        nothingFoundMessage: 'Nothing found...',
       },
       styles: {
         section: { width: 24, margin: '0 16px' },
@@ -149,7 +151,7 @@ export const theme = createTheme({
         searchable: true,
         checkIconPosition: 'right',
         hidePickedOptions: true,
-        comboboxProps: { shadow: 'xl' },
+        comboboxProps: { shadow: 'xs' },
       },
       styles: {
         input: {

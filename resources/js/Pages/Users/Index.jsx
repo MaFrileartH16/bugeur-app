@@ -1,3 +1,4 @@
+import { PageHeadings } from '@/Components/PageHeadings.jsx';
 import { AppLayout } from '@/Layouts/AppLayout.jsx';
 import { router } from '@inertiajs/react';
 import {
@@ -141,10 +142,13 @@ const Index = (props) => {
       </Modal>
 
       <Container flex={1} size="xl" w="100%" my={32}>
-        <Group mb={32} justify="space-between">
-          <Title>{props.title}</Title>
+        <Group justify="space-between" align="start">
+          <PageHeadings
+            title="Users"
+            description="View, manage, and assign roles to user accounts within the system."
+          />
 
-          <Tooltip label="Add User">
+          <Tooltip label="Craete User">
             <ActionIcon
               display={{
                 base: 'block',
@@ -164,11 +168,11 @@ const Index = (props) => {
             }}
             onClick={() => router.get(route('users.create'))}
           >
-            Add User
+            Create User
           </Button>
         </Group>
 
-        <Card withBorder>
+        <Card withBorder shadow="xs">
           <Card.Section withBorder p={16}>
             <TextInput
               leftSection={<IconSearch />}
@@ -194,7 +198,7 @@ const Index = (props) => {
                     lg: 3,
                   }}
                 >
-                  <Card shadow="sm" radius="md" withBorder>
+                  <Card shadow="xs" radius="md" withBorder>
                     <Menu
                       shadow="xl"
                       position="bottom-end"
@@ -228,7 +232,7 @@ const Index = (props) => {
 
                     <Avatar
                       mx="auto"
-                      size={96}
+                      size={64}
                       color={
                         user.role === 'Project Manager'
                           ? 'magic'
@@ -244,7 +248,7 @@ const Index = (props) => {
                     <Title order={3} align="center" mt={16} lineClamp={1}>
                       {user.full_name}
                     </Title>
-                    <Text align="center" color="dimmed" size="sm" mb={16}>
+                    <Text align="center" c="ghost" size="sm" mb={16}>
                       {user.email}
                     </Text>
                     <Badge

@@ -1,5 +1,6 @@
 import { Footer } from '@/Components/Footer';
 import { Header } from '@/Components/Header.jsx';
+import { ScrollToTop } from '@/Components/ScrollToTop.jsx';
 import { Head } from '@inertiajs/react';
 import { Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
@@ -30,6 +31,8 @@ export const AppLayout = (props) => {
 
         <Footer />
       </Stack>
+
+      <ScrollToTop />
     </>
   );
 };

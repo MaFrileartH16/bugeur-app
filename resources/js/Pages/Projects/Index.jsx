@@ -1,8 +1,10 @@
+import { PageHeadings } from '@/Components/PageHeadings.jsx';
 import { AppLayout } from '@/Layouts/AppLayout.jsx';
 import { router } from '@inertiajs/react';
 import {
   ActionIcon,
-  Badge,
+  Avatar,
+  Box,
   Button,
   Card,
   Container,
@@ -22,12 +24,12 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import {
   IconDotsVertical,
+  IconFolders,
   IconPencil,
   IconPlus,
   IconSearch,
   IconSearchOff,
   IconTrash,
-  IconUsers,
 } from '@tabler/icons-react';
 import { useState } from 'react';
 
@@ -68,7 +70,7 @@ const Index = (props) => {
 
   const renderEmptyState = () => (
     <Stack align="center" py={32} spacing="xs">
-      <IconUsers size={48} color="gray" />
+      <IconFolders size={48} color="gray" />
       <Title order={3} c="gray">
         No projects available yet.
       </Title>
@@ -89,9 +91,17 @@ const Index = (props) => {
     per_page * activePage,
   )} of ${total}`;
 
+  const getInitials = (name) => {
+    const parts = name.trim().split(' ');
+    if (parts.length === 1) {
+      return parts[0][0].toUpperCase();
+    }
+    return `${parts[0][0]}${parts.at(-1)[0]}`.toUpperCase();
+  };
+
   return (
     <AppLayout
-      title={props.title}
+      title="Projects"
       user={props.auth.user}
       notification={props.notification}
     >
@@ -112,35 +122,40 @@ const Index = (props) => {
       </Modal>
 
       <Container flex={1} size="xl" w="100%" my={32}>
-        <Group justify="space-between" mb={32}>
-          <Title order={2}>{props.title}</Title>
+        <Group justify="space-between" align="start">
+          <PageHeadings
+            title="Projects"
+            description="Browse, manage, and track the progress of all projects within the system."
+          />
 
-          <Group spacing="xs">
-            <Tooltip label="Add Project">
-              <ActionIcon
+          {props.auth.user.role === 'Admin' && (
+            <>
+              <Tooltip label="Create Project">
+                <ActionIcon
+                  display={{
+                    base: 'block',
+                    xs: 'none',
+                  }}
+                  onClick={() => router.get(route('projects.create'))}
+                >
+                  <IconPlus />
+                </ActionIcon>
+              </Tooltip>
+              <Button
+                leftSection={<IconPlus />}
                 display={{
-                  base: 'block',
-                  xs: 'none',
+                  base: 'none',
+                  xs: 'block',
                 }}
                 onClick={() => router.get(route('projects.create'))}
               >
-                <IconPlus />
-              </ActionIcon>
-            </Tooltip>
-            <Button
-              leftSection={<IconPlus />}
-              display={{
-                base: 'none',
-                xs: 'block',
-              }}
-              onClick={() => router.get(route('projects.create'))}
-            >
-              Add Project
-            </Button>
-          </Group>
+                Create Project
+              </Button>
+            </>
+          )}
         </Group>
 
-        <Card withBorder>
+        <Card withBorder shadow="xs">
           <Card.Section withBorder p={16}>
             <TextInput
               leftSection={<IconSearch />}
@@ -160,84 +175,157 @@ const Index = (props) => {
                 <Grid.Col
                   key={project.id}
                   span={{
-                    base: 12, // Full width for extra small screens
-                    sm: 6, // Two columns for small screens
-                    md: 4, // Three columns for medium and above
+                    base: 12,
+                    sm: 6,
                   }}
                 >
                   <Card
-                    shadow="sm"
-                    radius="md"
+                    shadow="xs"
                     withBorder
                     sx={{ position: 'relative' }}
+                    style={{
+                      cursor: 'pointer',
+                    }}
+                    onClick={() =>
+                      router.get(route('projects.show', project.id))
+                    }
                   >
                     <Flex align="center">
-                      <Title order={3} lineClamp={1}>
-                        {project.title}
-                      </Title>
+                      <Box>
+                        <Title order={3} lineClamp={1}>
+                          {project.title}
+                        </Title>
+                        <Text c="ghost" size="sm">
+                          Created on{' '}
+                          {new Date(project.created_at).toLocaleString(
+                            'en-US',
+                            {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              second: '2-digit',
+                              hour12: false,
+                            },
+                          )}{' '}
+                          • Total Bugs: 234
+                        </Text>
+                      </Box>
 
-                      <Menu
-                        shadow="xl"
-                        position="bottom-end"
-                        withArrow
-                        arrowPosition="center"
-                      >
-                        <Menu.Target>
-                          <ActionIcon
-                            ml="auto"
-                            variant="subtle"
-                            color="ghost"
-                            sx={{
-                              position: 'absolute',
-                              top: 8,
-                              right: 8,
-                              zIndex: 2,
-                            }}
-                          >
-                            <IconDotsVertical />
-                          </ActionIcon>
-                        </Menu.Target>
-                        <Menu.Dropdown p={0}>
-                          <Menu.Item
-                            leftSection={<IconPencil />}
-                            onClick={() => handleEdit(project)}
-                            color="yellow"
-                            h={48}
-                          >
-                            Edit
-                          </Menu.Item>
-                          <Menu.Item
-                            leftSection={<IconTrash />}
-                            onClick={() => confirmDelete(project)}
-                            color="red"
-                            h={48}
-                          >
-                            Delete
-                          </Menu.Item>
-                        </Menu.Dropdown>
-                      </Menu>
+                      {props.auth.user.role === 'Admin' && (
+                        <Menu
+                          shadow="xl"
+                          position="bottom-end"
+                          withArrow
+                          arrowPosition="center"
+                        >
+                          <Menu.Target>
+                            <ActionIcon
+                              ml="auto"
+                              variant="subtle"
+                              color="ghost"
+                              onClick={(e) => e.stopPropagation()}
+                              sx={{
+                                position: 'absolute',
+                                top: 8,
+                                right: 8,
+                                zIndex: 2,
+                              }}
+                            >
+                              <IconDotsVertical />
+                            </ActionIcon>
+                          </Menu.Target>
+                          <Menu.Dropdown p={0}>
+                            <Menu.Item
+                              leftSection={<IconPencil />}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEdit(project);
+                              }}
+                              color="yellow"
+                              h={48}
+                            >
+                              Edit
+                            </Menu.Item>
+                            <Menu.Item
+                              leftSection={<IconTrash />}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                confirmDelete(project);
+                              }}
+                              color="red"
+                              h={48}
+                            >
+                              Delete
+                            </Menu.Item>
+                          </Menu.Dropdown>
+                        </Menu>
+                      )}
                     </Flex>
 
-                    <Text color="dimmed" size="sm" mt={8} lineClamp={2}>
+                    <Text color="dimmed" size="sm" my={16} lineClamp={2}>
                       {project.description || 'No description available'}
                     </Text>
 
-                    <Text align="center" color="dimmed" size="sm" mt={16}>
-                      <strong>Working On:</strong>
-                    </Text>
-                    <Group position="center" spacing="xs" mt={8}>
-                      {project.working_on.length > 0 ? (
-                        project.working_on.map((user) => (
-                          <Badge key={user.id} color="blue" size="sm">
-                            {user.full_name}
-                          </Badge>
-                        ))
-                      ) : (
-                        <Text size="xs" color="dimmed">
-                          No users assigned
-                        </Text>
-                      )}
-                    </Group>
+                    <SimpleGrid cols={2}>
+                      <Box>
+                        <Title order={5}>Manager</Title>
+                        <Tooltip label={project.manager.full_name} withArrow>
+                          <Avatar color="magic" size={48}>
+                            {getInitials(project.manager.full_name)}
+                          </Avatar>
+                        </Tooltip>
+                      </Box>
+
+                      <Flex justify="flex-end">
+                        <Box>
+                          <Title order={5} align="end">
+                            Members
+                          </Title>
+                          <Avatar.Group>
+                            {project.working_on.slice(0, 3).map((member) => (
+                              <Tooltip
+                                key={member.id}
+                                label={`${member.full_name} (${member.role})`}
+                              >
+                                <Avatar
+                                  color={
+                                    member.role === 'Project Manager'
+                                      ? 'magic'
+                                      : member.role === 'Developer'
+                                        ? 'peach'
+                                        : member.role === 'Quality Assurance'
+                                          ? 'soap'
+                                          : 'default'
+                                  }
+                                  size={48}
+                                >
+                                  {getInitials(member.full_name)}
+                                </Avatar>
+                              </Tooltip>
+                            ))}
+                            {project.working_on.length > 3 && (
+                              <Tooltip
+                                label={project.working_on
+                                  .slice(3)
+                                  .map(
+                                    (member) =>
+                                      `${member.full_name} (${member.role})`,
+                                  )
+                                  .join(', ')}
+                                multiline
+                                width={200}
+                              >
+                                <Avatar color="ghost" size={48}>
+                                  +{project.working_on.length - 3}
+                                </Avatar>
+                              </Tooltip>
+                            )}
+                          </Avatar.Group>
+                        </Box>
+                      </Flex>
+                    </SimpleGrid>
                   </Card>
                 </Grid.Col>
               ))}

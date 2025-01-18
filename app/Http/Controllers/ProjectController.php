@@ -5,16 +5,18 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Models\User;
 use Exception;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class ProjectController extends Controller
 {
   /**
    * Display a listing of the projects.
    */
-  public function index()
+  public function index(): Response
   {
     $page = request('page', 1);
     $cacheKey = "projects_index_page_$page";
@@ -38,7 +40,7 @@ class ProjectController extends Controller
   /**
    * Store a newly created project in storage.
    */
-  public function store(Request $request)
+  public function store(Request $request): RedirectResponse
   {
     // Validasi input
     $request->validate([
@@ -85,7 +87,7 @@ class ProjectController extends Controller
   /**
    * Show the form for creating a new project.
    */
-  public function create()
+  public function create(): Response
   {
     $managers = User::where('role', 'project_manager')->get();
 
@@ -93,7 +95,7 @@ class ProjectController extends Controller
     $users = User::whereNotIn('role', ['admin', 'project_manager'])->get();
 
     return Inertia::render('Projects/Create', [
-      'title' => 'Add Project',
+      'title' => 'Create Project',
       'managers' => $managers,
       'users' => $users,
     ]);
@@ -103,7 +105,7 @@ class ProjectController extends Controller
   /**
    * Clear cache for all project index pages.
    */
-  private function clearCache()
+  private function clearCache(): void
   {
     $page = 1;
     while (Cache::has("projects_index_page_$page")) {
@@ -115,7 +117,7 @@ class ProjectController extends Controller
   /**
    * Remove the specified project from storage.
    */
-  public function destroy(Project $project)
+  public function destroy(Project $project): RedirectResponse
   {
     try {
       $project->delete();
@@ -139,7 +141,7 @@ class ProjectController extends Controller
   /**
    * Show the form for editing the specified project.
    */
-  public function edit(Project $project)
+  public function edit(Project $project): Response
   {
     $managers = User::where('role', 'project_manager')->get();
 
@@ -161,7 +163,7 @@ class ProjectController extends Controller
   /**
    * Update the specified project in storage.
    */
-  public function update(Request $request, Project $project)
+  public function update(Request $request, Project $project): RedirectResponse
   {
     // Validasi input
     $request->validate([
@@ -199,4 +201,19 @@ class ProjectController extends Controller
       ]);
     }
   }
+
+  /**
+   * Display the specified project details.
+   */
+  public function show(Project $project): Response
+  {
+    // Load relasi manager dan workingOn (anggota tim)
+    $project->load(['manager', 'workingOn']);
+
+    return Inertia::render('Projects/Show', [
+      'title' => 'Project Details',
+      'project' => $project, // Kirim data proyek
+    ]);
+  }
+
 }

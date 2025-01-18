@@ -23,7 +23,7 @@ class UserSeeder extends Seeder
 
     $roles = ['project_manager', 'developer', 'quality_assurance'];
     foreach ($roles as $role) {
-      User::factory(4)->create([
+      User::factory(50)->create([
         'role' => $role,
       ]);
     }

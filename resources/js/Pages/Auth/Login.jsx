@@ -106,7 +106,7 @@ const Login = (props) => {
       <AppLayout title={props.title} notification={props.notification}>
         <Center flex={1}>
           <Container flex={1} size="xs">
-            <Title order={1}>Login to your account</Title>
+            <Title order={1}>Login to account</Title>
 
             <Stack my={16}>
               {fields.map(({ component: Component, ...restField }, index) => (
