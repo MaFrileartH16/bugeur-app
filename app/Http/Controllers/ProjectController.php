@@ -22,7 +22,7 @@ class ProjectController extends Controller
     $cacheKey = "projects_index_page_$page";
 
     $projects = Cache::remember($cacheKey, now()->addMinutes(10), function () {
-      return Project::with(['manager', 'workingOn'])
+      return Project::with(['manager', 'workingOn', 'bugs'])
         ->orderBy('created_at', 'desc')
         ->paginate(16);
     });
@@ -207,13 +207,25 @@ class ProjectController extends Controller
    */
   public function show(Project $project): Response
   {
-    // Load relasi manager dan workingOn (anggota tim)
-    $project->load(['manager', 'workingOn']);
+    // Load relasi manager, workingOn (anggota tim), dan bugs
+    $project->load(['manager', 'workingOn',  'bugs.assignee',]);
+
+    // Proses bugs untuk memastikan evidence_image menggunakan 'storage/'
+    $project->bugs = $project->bugs->map(function ($bug) {
+      $bug->evidence_image = $bug->evidence_image
+        ? (strpos($bug->evidence_image, 'http') === 0 || strpos($bug->evidence_image, 'https') === 0
+          ? $bug->evidence_image
+          : url('storage/' . $bug->evidence_image))
+        : null;
+
+      return $bug;
+    });
 
     return Inertia::render('Projects/Show', [
       'title' => 'Project Details',
-      'project' => $project, // Kirim data proyek
+      'project' => $project,
     ]);
   }
+
 
 }

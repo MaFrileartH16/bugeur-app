@@ -69,24 +69,25 @@ export const theme = createTheme({
       styles: {
         section: { width: 24, margin: '0 16px' },
         wrapper: { marginBottom: 0 },
-        label: { marginBottom: 8 },
+        // label: { marginBottom: 8 },
         input: {
           padding: '0 16px 0px 56px',
           height: 48,
+          // marginTop: 16,
         },
-        error: { marginTop: 8 },
+        // error: { marginTop: 8 },
       },
     }),
     PasswordInput: PasswordInput.extend({
       styles: {
         section: { width: 24, margin: '0 16px' },
         wrapper: { marginBottom: 0 },
-        label: { marginBottom: 8 },
+        // label: { marginBottom: 8 },
         innerInput: {
           padding: '0 56px',
         },
         input: { height: 48 },
-        error: { marginTop: 8 },
+        // error: { marginTop: 8 },
       },
     }),
     Textarea: TextInput.extend({

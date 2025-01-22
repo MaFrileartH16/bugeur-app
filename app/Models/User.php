@@ -25,6 +25,7 @@ class User extends Authenticatable
    * @var list<string>
    */
   protected $fillable = [
+    'avatar',
     'full_name',
     'email',
     'role',
@@ -98,6 +99,11 @@ class User extends Authenticatable
       ->implode(' ');
   }
 
+  public function getAvatarAttribute(): string
+  {
+    return asset('storage/' . $this->attributes['avatar']);
+  }
+
   /**
    * Get the attributes that should be cast.
    *
@@ -110,5 +116,4 @@ class User extends Authenticatable
       'password' => 'hashed',
     ];
   }
-
 }

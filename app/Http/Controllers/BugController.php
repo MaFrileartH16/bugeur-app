@@ -16,18 +16,8 @@ class BugController extends Controller
    */
   public function index(Project $project)
   {
-    $bugs = Bug::with(['assignee', 'screenshots'])
-      ->where('project_id', $project->id)
+    $bugs = Bug::where('project_id', $project->id)
       ->get();
-
-    // Proses URL screenshots
-    $bugs->each(function ($bug) {
-      $bug->screenshots->each(function ($screenshot) {
-        if (substr($screenshot->images, 0, 4) !== 'http') {
-          $screenshot->images = asset('storage/' . $screenshot->images);
-        }
-      });
-    });
 
     return Inertia::render('Bugs/Index', [
       'project' => $project,
@@ -94,27 +84,36 @@ class BugController extends Controller
    */
   public function store(Request $request, Project $project)
   {
-    $data = $request->all();
-    $data['project_id'] = $project->id;
+//    dd($request->all());
+    $validated = $request->validate([
+      'title' => 'required|string|max:255',
+      'description' => 'required|string',
+      'assignee_id' => 'nullable|exists:users,id',
+      'evidence_image' => 'nullable|image|max:2048',
+    ]);
 
-    // Konversi deadline ke format Y-m-d
-    if (!empty($data['deadline'])) {
-      $data['deadline'] = date('Y-m-d', strtotime($data['deadline']));
+    $evidenceImage = null;
+
+    if ($request->hasFile('evidence_image')) {
+      $evidenceImage = $request->file('evidence_image')->store('evidence_images', 'public');
     }
 
-    $bug = Bug::create($data);
-
-    // Simpan screenshots jika ada
-    if ($request->hasFile('screenshots')) {
-      foreach ($request->file('screenshots') as $file) {
-        $path = $file->store('screenshots', 'public');
-        $bug->screenshots()->create(['images' => $path]);
-      }
-    }
+    Bug::create([
+      'project_id' => $project->id,
+      'creator_id' => auth()->id(),
+      'assignee_id' => $validated['assignee_id'] ?? null,
+      'title' => $validated['title'],
+      'description' => $validated['description'],
+      'evidence_image' => $evidenceImage,
+    ]);
 
     return redirect()
-      ->route('projects.bugs.index', $project->id)
-      ->with('success', 'Bug created successfully.');
+      ->route('projects.show', $project->id)
+      ->with('notification', [
+        'status' => 'success',
+        'title' => 'Bug Created',
+        'message' => 'The bug has been successfully created and assigned.',
+      ]);
   }
 
   /**
@@ -122,7 +121,7 @@ class BugController extends Controller
    */
   public function create(Project $project)
   {
-    $users = User::all();
+    $users = User::where('role', 'developer')->get();
 
     return Inertia::render('Bugs/Create', [
       'project' => $project,

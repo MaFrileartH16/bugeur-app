@@ -1,10 +1,11 @@
-import { MantineProvider } from '@mantine/core';
-import '@mantine/core/styles.css';
-
 import { theme } from '@/theme.js';
 import { createInertiaApp } from '@inertiajs/react';
 import createServer from '@inertiajs/react/server';
+import '@mantine/charts/styles.css';
+import { MantineProvider } from '@mantine/core';
+import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
+import '@mantine/dropzone/styles.css';
 import { Notifications } from '@mantine/notifications';
 import '@mantine/notifications/styles.css';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';

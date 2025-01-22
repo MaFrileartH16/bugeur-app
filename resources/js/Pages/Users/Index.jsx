@@ -8,6 +8,7 @@ import {
   Button,
   Card,
   Container,
+  Flex,
   Grid,
   Group,
   Menu,
@@ -142,7 +143,7 @@ const Index = (props) => {
       </Modal>
 
       <Container flex={1} size="xl" w="100%" my={32}>
-        <Group justify="space-between" align="start">
+        <Flex justify="space-between" align="start" gap={16}>
           <PageHeadings
             title="Users"
             description="View, manage, and assign roles to user accounts within the system."
@@ -170,7 +171,7 @@ const Index = (props) => {
           >
             Create User
           </Button>
-        </Group>
+        </Flex>
 
         <Card withBorder shadow="xs">
           <Card.Section withBorder p={16}>

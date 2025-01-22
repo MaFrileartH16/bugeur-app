@@ -24,7 +24,7 @@ const Edit = (props) => {
   const form = useForm({
     full_name: user.full_name || '',
     email: user.email || '',
-    role: user.role || '',
+    role: user.role.toLowerCase().replace(/\s+/g, '_') || '',
   });
 
   const validateField = (field, value) => {
@@ -37,28 +37,51 @@ const Edit = (props) => {
     return null;
   };
 
-  const handleChange = (field) => (e) => {
+  const handleFullNameChange = (e) => {
     const value = e.target.value;
-    form.setData(field, value);
+    form.setData('full_name', value);
 
-    const error = validateField(field, value);
+    const error = validateField('full_name', value);
     if (error) {
-      form.setError(field, error);
+      form.setError('full_name', error);
     } else {
-      form.clearErrors(field);
+      form.clearErrors('full_name');
+    }
+  };
+
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    form.setData('email', value);
+
+    const error = validateField('email', value);
+    if (error) {
+      form.setError('email', error);
+    } else {
+      form.clearErrors('email');
+    }
+  };
+
+  const handleRoleChange = (value) => {
+    form.setData('role', value);
+
+    const error = validateField('role', value);
+    if (error) {
+      form.setError('role', error);
+    } else {
+      form.clearErrors('role');
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    form.put(route('users.update', user.id));
+    form.patch(route('users.update', user));
   };
 
   const fields = [
     {
       label: 'Full Name',
       value: form.data.full_name,
-      onChange: handleChange('full_name'),
+      onChange: handleFullNameChange,
       error: form.errors.full_name,
       placeholder: 'e.g., John Doe',
       description: 'Update the user’s full name (e.g., first and last name).',
@@ -68,7 +91,7 @@ const Edit = (props) => {
     {
       label: 'Email Address',
       value: form.data.email,
-      onChange: handleChange('email'),
+      onChange: handleEmailChange,
       error: form.errors.email,
       placeholder: 'e.g., johndoe@bugeur.id',
       description: 'Provide a valid email address ending with @bugeur.id.',
@@ -78,7 +101,7 @@ const Edit = (props) => {
     {
       label: 'Role',
       defaultValue: form.data.role.toLowerCase().replace(/\s+/g, '_'),
-      onChange: handleChange('role'),
+      onChange: handleRoleChange,
       error: form.errors.role,
       placeholder: 'Select user’s role',
       description: 'Assign the user a role: Project Manager, Developer, or QA.',
@@ -106,7 +129,7 @@ const Edit = (props) => {
             breadcrumbs={[
               {
                 label: 'Users',
-                onClick: () => router.get(route('users.index')),
+                onClick: () => router.get(route('users.index', { page: 1 })),
               },
               {
                 label: 'Edit',
@@ -115,14 +138,14 @@ const Edit = (props) => {
             ]}
           />
 
-          <Grid gutter={16} justify="flex-end">
+          <Grid gutter={32} justify="flex-end">
             {fields.map(
               (
                 { component: Component, label, description, ...fieldProps },
                 index,
               ) => (
                 <Grid.Col span={{ base: 12 }} key={index}>
-                  <Grid gutter={{ base: 8, sm: 0 }} align="center">
+                  <Grid gutter={{ base: 8, sm: 0 }} align="start">
                     <Grid.Col span={{ base: 12, sm: 4 }}>
                       <Title order={5}>{label}</Title>
                     </Grid.Col>

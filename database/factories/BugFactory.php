@@ -22,12 +22,16 @@ class BugFactory extends Factory
   public function definition(): array
   {
     return [
-      'project_id' => Project::inRandomOrder()->value('id'),
-      'creator_id' => User::where('role', 'quality_assurance')->inRandomOrder()->value('id'),
-      'assignee_id' => User::where('role', 'developer')->inRandomOrder()->value('id'),
+      'project_id' => Project::inRandomOrder()->value('id')
+        ?? Project::factory()->create()->id, // Jika tidak ada proyek, buat baru
+      'creator_id' => User::where('role', 'quality_assurance')->inRandomOrder()->value('id')
+        ?? User::factory()->create(['role' => 'quality_assurance'])->id, // Jika tidak ada QA, buat baru
+      'assignee_id' => User::where('role', 'developer')->inRandomOrder()->value('id')
+        ?? User::factory()->create(['role' => 'developer'])->id, // Jika tidak ada Developer, buat baru
       'title' => $this->faker->sentence(),
       'description' => $this->faker->paragraph(),
-      'status' => $this->faker->randomElement(['in_review', 'open', 'in_progress', 'resolved', 'closed']),
+      'evidence_image' => $this->faker->imageUrl(),
+      'created_at' => $this->faker->dateTimeBetween('-10 years', 'now'),// Random created_at dalam 1 tahun terakhir
     ];
   }
 }

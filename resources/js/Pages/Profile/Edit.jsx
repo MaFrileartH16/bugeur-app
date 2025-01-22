@@ -1,10 +1,12 @@
 import { PageHeadings } from '@/Components/PageHeadings.jsx';
 import { AppLayout } from '@/Layouts/AppLayout.jsx';
-import { router, useForm } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
 import {
+  Avatar,
   Button,
-  Container,
+  FileButton,
   Grid,
+  Group,
   PasswordInput,
   Text,
   TextInput,
@@ -15,171 +17,228 @@ import {
   IconKey,
   IconMail,
   IconPassword,
+  IconPhotoUp,
   IconUser,
 } from '@tabler/icons-react';
 
 const Edit = (props) => {
   const { user } = props.auth;
-
   const form = useForm({
+    _method: 'put',
+    avatar: user.avatar || '',
     full_name: user.full_name || '',
     email: user.email || '',
     password: '',
   });
 
-  const validateField = (field, value) => {
-    if (field === 'password' && !value) {
-      return null; // Skip validation if password is empty
-    }
+  console.log(form.data);
 
-    if (!value) {
-      const formattedField = field
-        .replace('_', ' ')
-        .replace(/^\w/, (c) => c.toUpperCase());
-      return `${formattedField} is required.`;
+  const validateAvatar = (file) => {
+    if (file && !['image/png', 'image/jpeg', 'image/jpg'].includes(file.type)) {
+      return 'Only PNG, JPEG, and JPG formats are allowed.';
     }
-
-    if (field === 'email' && !value.endsWith('@bugeur.id')) {
-      return 'Email must use @bugeur.id.';
+    if (file && file.size > 2 * 1024 * 1024) {
+      // 2 MB limit
+      return 'File size must not exceed 2 MB.';
     }
-
     return null;
   };
 
-  const handleChange = (field) => (e) => {
-    const value = e.target.value;
-    form.setData(field, value);
-
-    const error = validateField(field, value);
+  const handleAvatarChange = (file) => {
+    const error = validateAvatar(file);
     if (error) {
-      form.setError(field, error);
-    } else {
-      form.clearErrors(field);
+      form.setError('avatar', error);
+      return;
     }
+
+    form.setData('avatar', file);
+    form.clearErrors('avatar');
+  };
+
+  const validateEmail = (value) => {
+    if (!value) return 'Email Address is required.';
+    if (!value.endsWith('@bugeur.id')) return 'Email must use @bugeur.id.';
+    return null;
+  };
+
+  const validatePassword = (value) => {
+    if (value && value.length < 8)
+      return 'Password must be at least 8 characters.';
+    return null;
+  };
+
+  const handleChangeEmail = (e) => {
+    const value = e.target.value;
+    form.setData('email', value);
+
+    const error = validateEmail(value);
+    error ? form.setError('email', error) : form.clearErrors('email');
+  };
+
+  const handleChangePassword = (e) => {
+    const value = e.target.value;
+    form.setData('password', value);
+
+    const error = validatePassword(value);
+    error ? form.setError('password', error) : form.clearErrors('password');
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    form.put(route('profile.update', user), {
+    form.post(route('profile.update', user), {
       onFinish: () => form.reset('password'),
     });
   };
-
-  const fields = [
-    {
-      label: 'Full Name',
-      value: form.data.full_name,
-      onChange: handleChange('full_name'),
-      error: form.errors.full_name,
-      placeholder: 'e.g., John Doe',
-      description:
-        'This is your full name as it appears on your profile. It cannot be edited.',
-      icon: <IconUser />,
-      component: TextInput,
-      readOnly: true,
-      disabled: true,
-    },
-    {
-      label: 'Role',
-      value: user.role,
-      placeholder: 'e.g., Project Manager',
-      description:
-        'Your assigned role within the system. This field is not editable.',
-      icon: <IconKey />,
-      component: TextInput,
-      readOnly: true,
-      disabled: true,
-    },
-    {
-      label: 'Email Address',
-      value: form.data.email,
-      onChange: handleChange('email'),
-      error: form.errors.email,
-      placeholder: 'e.g., johndoe@bugeur.id',
-      description:
-        'Your email address used for login and communication. It cannot be changed.',
-      icon: <IconMail />,
-      component: TextInput,
-      readOnly: true,
-      disabled: true,
-    },
-    {
-      label: 'New Password',
-      value: form.data.password,
-      onChange: handleChange('password'),
-      error: form.errors.password,
-      placeholder: 'Leave this blank to keep your current password',
-      description:
-        'Enter a new password if you wish to update it. Otherwise, leave it blank.',
-      icon: <IconPassword />,
-      component: PasswordInput,
-    },
-  ];
 
   const hasErrors = Object.keys(form.errors).length > 0;
 
   return (
     <form onSubmit={handleSubmit}>
-      <AppLayout title={props.title} user={user}>
-        <Container flex={1} size="xl" w="100%" py={32}>
-          <PageHeadings
-            title="Profile"
-            description="Access and update your account details, including personal information and preferences."
-            breadcrumbs={[
-              {
-                label: 'Dashboard',
-                onClick: () => router.get(route('dashboard')),
-              },
-              {
-                label: 'Profile',
-                onClick: () => router.get(route('profile.edit')),
-              },
-            ]}
-          />
+      <AppLayout
+        title={props.title}
+        user={user}
+        notification={props.notification}
+      >
+        <PageHeadings
+          title="Profile"
+          description="Access and update your account details, including personal information and preferences."
+        />
 
-          <Grid gutter={16} justify="flex-end">
-            {fields.map((field, index) => {
-              const Component = field.component;
-              return (
-                <Grid.Col key={index} span={{ base: 12 }}>
-                  <Grid gutter={8} align="center">
-                    <Grid.Col span={{ base: 12, sm: 4 }}>
-                      <Title order={5}>{field.label}</Title>
-                    </Grid.Col>
-                    <Grid.Col span={{ base: 12, sm: 8 }}>
-                      <Component
-                        leftSection={field.icon}
-                        placeholder={field.placeholder}
-                        value={field.value}
-                        onChange={field.onChange}
-                        error={field.error}
-                        readOnly={field.readOnly || false}
-                        disabled={field.disabled || false}
-                      />
-                      {field.description && (
-                        <Text size="sm" c="ghost" mt={8}>
-                          {field.description}
-                        </Text>
-                      )}
-                    </Grid.Col>
-                  </Grid>
-                </Grid.Col>
-              );
-            })}
+        <Grid gutter={16} justify="flex-end">
+          {/* Avatar Field */}
+          <Grid.Col span={{ base: 12 }}>
+            <Grid gutter={8} align="start">
+              <Grid.Col span={{ base: 12, sm: 4 }}>
+                <Title order={5}>Avatar</Title>
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 8 }}>
+                <Group align="flex-start" spacing="sm">
+                  <Avatar
+                    src={
+                      form.data.avatar instanceof File
+                        ? URL.createObjectURL(form.data.avatar)
+                        : form.data.avatar
+                    }
+                    alt={form.data.full_name}
+                    size={80}
+                  />
 
-            <Grid.Col span={{ base: 12, sm: 8, smOffset: 4 }}>
-              <Button
-                type="submit"
-                fullWidth
-                leftSection={<IconCornerDownLeft />}
-                disabled={form.processing || hasErrors}
-                loading={form.processing}
-              >
-                Save Changes
-              </Button>
-            </Grid.Col>
-          </Grid>
-        </Container>
+                  <FileButton
+                    onChange={handleAvatarChange}
+                    accept="image/png,image/jpeg,image/jpg"
+                  >
+                    {(props) => (
+                      <Button
+                        variant="subtle"
+                        {...props}
+                        leftSection={<IconPhotoUp />}
+                      >
+                        Upload Photo
+                      </Button>
+                    )}
+                  </FileButton>
+                </Group>
+
+                {form.errors.avatar && (
+                  <Text color="red" size="sm">
+                    {form.errors.avatar}
+                  </Text>
+                )}
+              </Grid.Col>
+            </Grid>
+          </Grid.Col>
+
+          {/* Full Name Field */}
+          <Grid.Col span={{ base: 12 }}>
+            <Grid gutter={8} align="start">
+              <Grid.Col span={{ base: 12, sm: 4 }}>
+                <Title order={5}>Full Name</Title>
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 8 }}>
+                <TextInput
+                  value={form.data.full_name}
+                  placeholder="e.g., John Doe"
+                  description="This is your full name as it appears on your profile. It cannot be edited."
+                  leftSection={<IconUser />}
+                  readOnly
+                  disabled
+                />
+              </Grid.Col>
+            </Grid>
+          </Grid.Col>
+
+          {/* Role Field */}
+          <Grid.Col span={{ base: 12 }}>
+            <Grid gutter={8} align="start">
+              <Grid.Col span={{ base: 12, sm: 4 }}>
+                <Title order={5}>Role</Title>
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 8 }}>
+                <TextInput
+                  value={user.role}
+                  placeholder="e.g., Project Manager"
+                  description="Your assigned role within the system. This field is not editable."
+                  leftSection={<IconKey />}
+                  readOnly
+                  disabled
+                />
+              </Grid.Col>
+            </Grid>
+          </Grid.Col>
+
+          {/* Email Field */}
+          <Grid.Col span={{ base: 12 }}>
+            <Grid gutter={8} align="start">
+              <Grid.Col span={{ base: 12, sm: 4 }}>
+                <Title order={5}>Email Address</Title>
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 8 }}>
+                <TextInput
+                  value={form.data.email}
+                  onChange={handleChangeEmail}
+                  error={form.errors.email}
+                  placeholder="e.g., johndoe@bugeur.id"
+                  description="Your email address used for login and communication. It cannot be changed."
+                  leftSection={<IconMail />}
+                  readOnly
+                  disabled
+                />
+              </Grid.Col>
+            </Grid>
+          </Grid.Col>
+
+          {/* Password Field */}
+          <Grid.Col span={{ base: 12 }}>
+            <Grid gutter={8} align="start">
+              <Grid.Col span={{ base: 12, sm: 4 }}>
+                <Title order={5}>New Password</Title>
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 8 }}>
+                <PasswordInput
+                  value={form.data.password}
+                  onChange={handleChangePassword}
+                  error={form.errors.password}
+                  placeholder="Leave this blank to keep your current password"
+                  description="Enter a new password if you wish to update it. Otherwise, leave it blank."
+                  leftSection={<IconPassword />}
+                />
+              </Grid.Col>
+            </Grid>
+          </Grid.Col>
+
+          {/* Submit Button */}
+          <Grid.Col span={{ base: 12, sm: 8, smOffset: 4 }}>
+            <Button
+              type="submit"
+              fullWidth
+              leftSection={<IconCornerDownLeft />}
+              disabled={form.processing || hasErrors}
+              loading={form.processing}
+            >
+              Save Changes
+            </Button>
+          </Grid.Col>
+        </Grid>
       </AppLayout>
     </form>
   );

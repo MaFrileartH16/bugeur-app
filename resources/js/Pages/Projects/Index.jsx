@@ -122,7 +122,7 @@ const Index = (props) => {
       </Modal>
 
       <Container flex={1} size="xl" w="100%" my={32}>
-        <Group justify="space-between" align="start">
+        <Flex justify="space-between" align="start" gap={16}>
           <PageHeadings
             title="Projects"
             description="Browse, manage, and track the progress of all projects within the system."
@@ -153,7 +153,7 @@ const Index = (props) => {
               </Button>
             </>
           )}
-        </Group>
+        </Flex>
 
         <Card withBorder shadow="xs">
           <Card.Section withBorder p={16}>
@@ -206,10 +206,10 @@ const Index = (props) => {
                               hour: '2-digit',
                               minute: '2-digit',
                               second: '2-digit',
-                              hour12: false,
+                              hour12: true,
                             },
                           )}{' '}
-                          • Total Bugs: 234
+                          • Total Bugs: {project.bugs.length}
                         </Text>
                       </Box>
 
@@ -269,17 +269,17 @@ const Index = (props) => {
                     </Text>
 
                     <SimpleGrid cols={2}>
-                      <Box>
+                      <Stack gap={8}>
                         <Title order={5}>Manager</Title>
                         <Tooltip label={project.manager.full_name} withArrow>
                           <Avatar color="magic" size={48}>
                             {getInitials(project.manager.full_name)}
                           </Avatar>
                         </Tooltip>
-                      </Box>
+                      </Stack>
 
                       <Flex justify="flex-end">
-                        <Box>
+                        <Stack gap={16}>
                           <Title order={5} align="end">
                             Members
                           </Title>
@@ -323,7 +323,7 @@ const Index = (props) => {
                               </Tooltip>
                             )}
                           </Avatar.Group>
-                        </Box>
+                        </Stack>
                       </Flex>
                     </SimpleGrid>
                   </Card>

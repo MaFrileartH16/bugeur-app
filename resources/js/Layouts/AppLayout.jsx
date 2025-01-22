@@ -2,7 +2,7 @@ import { Footer } from '@/Components/Footer';
 import { Header } from '@/Components/Header.jsx';
 import { ScrollToTop } from '@/Components/ScrollToTop.jsx';
 import { Head } from '@inertiajs/react';
-import { Stack } from '@mantine/core';
+import { Flex, Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useEffect } from 'react';
 
@@ -27,7 +27,9 @@ export const AppLayout = (props) => {
       <Stack gap={0} mih="100vh">
         <Header user={props.user} />
 
-        {props.children}
+        <Flex flex={1} direction="column" py={32} px={16}>
+          {props.children}
+        </Flex>
 
         <Footer />
       </Stack>

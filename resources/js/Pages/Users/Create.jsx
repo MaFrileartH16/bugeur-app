@@ -26,7 +26,7 @@ const Create = ({ auth }) => {
     full_name: '',
     email: '',
     role: '',
-    password: '',
+    password: '', // Auto-generated, but still kept for form state.
   });
 
   const validateField = (field, value) => {
@@ -39,15 +39,39 @@ const Create = ({ auth }) => {
     return null;
   };
 
-  const handleChange = (field) => (e) => {
+  const handleFullNameChange = (e) => {
     const value = e.target.value;
-    form.setData(field, value);
+    form.setData('full_name', value);
 
-    const error = validateField(field, value);
+    const error = validateField('full_name', value);
     if (error) {
-      form.setError(field, error);
+      form.setError('full_name', error);
     } else {
-      form.clearErrors(field);
+      form.clearErrors('full_name');
+    }
+  };
+
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    form.setData('email', value);
+    form.setData('password', value); // Automatically set password to match email.
+
+    const error = validateField('email', value);
+    if (error) {
+      form.setError('email', error);
+    } else {
+      form.clearErrors('email');
+    }
+  };
+
+  const handleRoleChange = (value) => {
+    form.setData('role', value);
+
+    const error = validateField('role', value);
+    if (error) {
+      form.setError('role', error);
+    } else {
+      form.clearErrors('role');
     }
   };
 
@@ -62,7 +86,7 @@ const Create = ({ auth }) => {
     {
       label: 'Full Name',
       value: form.data.full_name,
-      onChange: handleChange('full_name'),
+      onChange: handleFullNameChange,
       error: form.errors.full_name,
       placeholder: 'e.g., John Doe',
       description: 'Enter the user’s full name (e.g., first and last name).',
@@ -72,7 +96,7 @@ const Create = ({ auth }) => {
     {
       label: 'Email Address',
       value: form.data.email,
-      onChange: handleChange('email'),
+      onChange: handleEmailChange,
       error: form.errors.email,
       placeholder: 'e.g., johndoe@bugeur.id',
       description: 'Provide a valid email address ending with @bugeur.id.',
@@ -82,7 +106,7 @@ const Create = ({ auth }) => {
     {
       label: 'Role',
       value: form.data.role,
-      onChange: handleChange('role'),
+      onChange: handleRoleChange,
       error: form.errors.role,
       placeholder: 'Select user’s role',
       description: 'Assign the user a role: Project Manager, Developer, or QA.',
@@ -97,7 +121,6 @@ const Create = ({ auth }) => {
     {
       label: 'Password',
       value: form.data.password,
-      onChange: handleChange('password'),
       error: form.errors.password,
       placeholder: 'Auto-generated based on email',
       description:
@@ -123,7 +146,7 @@ const Create = ({ auth }) => {
             breadcrumbs={[
               {
                 label: 'Users',
-                onClick: () => router.get(route('users.index')),
+                onClick: () => router.get(route('users.index', { page: 1 })),
               },
               {
                 label: 'Create',
@@ -132,14 +155,14 @@ const Create = ({ auth }) => {
             ]}
           />
 
-          <Grid gutter={16} justify="flex-end">
+          <Grid gutter={32} justify="flex-end">
             {fields.map(
               (
                 { component: Component, label, description, ...fieldProps },
                 index,
               ) => (
                 <Grid.Col span={{ base: 12 }} key={index}>
-                  <Grid gutter={{ base: 8, sm: 0 }} align="center">
+                  <Grid gutter={{ base: 8, sm: 0 }} align="start">
                     <Grid.Col span={{ base: 12, sm: 4 }}>
                       <Title order={5}>{label}</Title>
                     </Grid.Col>

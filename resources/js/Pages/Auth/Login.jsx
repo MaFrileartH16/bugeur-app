@@ -1,12 +1,14 @@
+import { PasswordInput } from '@/Components/PasswordInput.jsx';
+import { TextInput } from '@/Components/TextInput.jsx';
 import { AppLayout } from '@/Layouts/AppLayout.jsx';
 import { useForm } from '@inertiajs/react';
 import {
+  Box,
   Button,
   Center,
   Container,
-  PasswordInput,
   Stack,
-  TextInput,
+  Text,
   Title,
 } from '@mantine/core';
 import {
@@ -15,7 +17,6 @@ import {
   IconMail,
   IconPassword,
 } from '@tabler/icons-react';
-import { useState } from 'react';
 
 const Login = (props) => {
   const form = useForm({
@@ -23,48 +24,45 @@ const Login = (props) => {
     password: '',
   });
 
-  const [showPassword, setShowPassword] = useState(false);
-
-  const validateField = (field, value) => {
-    const validators = {
-      email: {
-        required: 'Email is required.',
-        pattern: /^[a-zA-Z0-9._%+-]+@bugeur\.id$/,
-        patternError: 'Email must use @bugeur.id.',
-      },
-      password: {
-        required: 'Password is required.',
-      },
-    };
-
-    const rules = validators[field];
-    if (!rules) return null;
-
-    if (!value) return rules.required;
-    if (rules.pattern && !rules.pattern.test(value)) return rules.patternError;
-
+  const validateEmail = (value) => {
+    if (!value) return 'Please enter your email address.';
+    const pattern = /@bugeur\.id$/;
+    if (!pattern.test(value)) return 'Email must end with @bugeur.id.';
     return null;
   };
 
-  const handleChange = (field) => (e) => {
-    const value = e.target.value;
-    form.setData(field, value);
+  const validatePassword = (value) => {
+    if (!value) return 'Please enter your password.';
+    return null;
+  };
 
-    const error = validateField(field, value);
-    error ? form.setError(field, error) : form.clearErrors(field);
+  const handleChangeEmail = (e) => {
+    const value = e.target.value;
+    form.setData('email', value);
+
+    const error = validateEmail(value);
+    error ? form.setError('email', error) : form.clearErrors('email');
+  };
+
+  const handleChangePassword = (e) => {
+    const value = e.target.value;
+    form.setData('password', value);
+
+    const error = validatePassword(value);
+    error ? form.setError('password', error) : form.clearErrors('password');
   };
 
   const submit = (e) => {
     e.preventDefault();
 
-    const errors = {};
-    Object.keys(form.data).forEach((field) => {
-      const error = validateField(field, form.data[field]);
-      if (error) errors[field] = error;
-    });
+    const emailError = validateEmail(form.data.email);
+    const passwordError = validatePassword(form.data.password);
 
-    if (Object.keys(errors).length > 0) {
-      form.setErrors(errors);
+    if (emailError || passwordError) {
+      form.setErrors({
+        email: emailError,
+        password: passwordError,
+      });
       return;
     }
 
@@ -79,39 +77,48 @@ const Login = (props) => {
 
   const hasErrors = Object.keys(form.errors).length > 0;
 
-  const fields = [
-    {
-      label: 'Email Address',
-      value: form.data.email,
-      onChange: handleChange('email'),
-      error: form.errors.email,
-      placeholder: 'username@bugeur.id',
-      leftSection: <IconMail />,
-      component: TextInput,
-    },
-    {
-      label: 'Password',
-      type: showPassword ? 'text' : 'password',
-      value: form.data.password,
-      onChange: handleChange('password'),
-      error: form.errors.password,
-      placeholder: '********',
-      leftSection: <IconPassword />,
-      component: PasswordInput,
-    },
-  ];
-
   return (
-    <form onSubmit={submit}>
-      <AppLayout title={props.title} notification={props.notification}>
+    <form onSubmit={submit} aria-label="Login Form">
+      <AppLayout title="Login" notification={props.notification}>
         <Center flex={1}>
-          <Container flex={1} size="xs">
-            <Title order={1}>Login to account</Title>
+          <Container flex={1} size="xs" px={16} py={16}>
+            <Title order={2} component="h2" mb={8}>
+              Login to Your Account
+            </Title>
+            <Text mb={32}>
+              Access your account by logging in with your registered email and
+              password.
+            </Text>
 
-            <Stack my={16}>
-              {fields.map(({ component: Component, ...restField }, index) => (
-                <Component key={index} {...restField} />
-              ))}
+            <Stack gap={16} component="section" aria-labelledby="login-fields">
+              <Box>
+                <Text fw={500}>Email Address</Text>
+
+                <TextInput
+                  value={form.data.email}
+                  onChange={handleChangeEmail}
+                  error={form.errors.email}
+                  placeholder="e.g., user@bugeur.id"
+                  description="Please enter a valid email address ending with @bugeur.id."
+                  leftSection={<IconMail />}
+                  autoFocus
+                  autoComplete="email"
+                />
+              </Box>
+
+              <Box>
+                <Text fw={500}>Password</Text>
+
+                <PasswordInput
+                  id="password"
+                  value={form.data.password}
+                  onChange={handleChangePassword}
+                  error={form.errors.password}
+                  placeholder="Enter your secure password"
+                  description="Your password should be at least 8 characters long and secure."
+                  leftSection={<IconPassword />}
+                />
+              </Box>
             </Stack>
 
             <Button
@@ -122,6 +129,8 @@ const Login = (props) => {
               }
               loading={form.processing}
               disabled={!areFieldsFilled || hasErrors}
+              aria-label="Submit Login"
+              mt={16}
             >
               Login
             </Button>

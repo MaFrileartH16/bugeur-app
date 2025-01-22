@@ -25,6 +25,7 @@ class ProjectFactory extends Factory
         ])->id,
       'title' => $this->faker->sentence,
       'description' => $this->faker->paragraph,
+      'created_at' => $this->faker->dateTimeBetween('-10 years', 'now'), // Random year, month, and day within the last 10 years
     ];
   }
 }

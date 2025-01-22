@@ -1,149 +1,267 @@
-import { AppLayout } from '@/Layouts/AppLayout';
+import { PageHeadings } from '@/Components/PageHeadings.jsx';
+import { AppLayout } from '@/Layouts/AppLayout.jsx';
 import { router, useForm } from '@inertiajs/react';
 import {
   Button,
-  FileInput,
+  Container,
+  Grid,
   Group,
   Select,
-  Stack,
+  Text,
   Textarea,
   TextInput,
   Title,
 } from '@mantine/core';
-import { DatePickerInput } from '@mantine/dates';
+import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
+import {
+  IconAlignJustified,
+  IconBug,
+  IconCornerDownLeft,
+  IconPhoto,
+  IconUpload,
+  IconUser,
+  IconX,
+} from '@tabler/icons-react';
 
-const Create = ({ project, users }) => {
-  const { data, setData, post, processing, errors } = useForm({
+const CreateBug = ({ project, users, auth }) => {
+  const form = useForm({
     title: '',
     description: '',
     assignee_id: '',
-    status: 'open',
-    bug_type: 'minor',
-    screenshots: null,
-    project_id: project.id,
-    creator_id: '',
-    deadline: '', // Tambahkan deadline langsung ke data
+    evidence_image: null,
   });
 
-  console.log(data);
+  console.log(form.data);
+
+  // Handle change for "Title" field
+  const handleTitleChange = (e) => {
+    const value = e.target.value;
+    form.setData('title', value);
+
+    if (!value) {
+      form.setError('title', 'Title is required.');
+    } else {
+      form.clearErrors('title');
+    }
+  };
+
+  // Handle change for "Description" field
+  const handleDescriptionChange = (e) => {
+    const value = e.target.value;
+    form.setData('description', value);
+
+    if (!value) {
+      form.setError('description', 'Description is required.');
+    } else {
+      form.clearErrors('description');
+    }
+  };
+
+  // Handle change for "Assign To" field
+  const handleAssigneeChange = (value) => {
+    form.setData('assignee_id', value);
+
+    if (!value) {
+      form.setError('assignee_id', 'Assignee is required.');
+    } else {
+      form.clearErrors('assignee_id');
+    }
+  };
+
+  // Handle change for Dropzone
+  const handleDropzoneChange = (files) => {
+    const file = files[0];
+    form.setData('evidence_image', file);
+
+    if (!file) {
+      form.setError('evidence_image', 'Evidence image is required.');
+    } else {
+      form.clearErrors('evidence_image');
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    post(route('projects.bugs.store', project.id), {
-      onSuccess: () => {
-        console.log('Bug created successfully!');
-      },
+    form.post(route('projects.bugs.store', { project: project.id }), {
+    
     });
   };
 
   return (
-    <AppLayout title={`Add Bug to ${project.title}`}>
-      <Title order={2} mb="md">
-        Add Bug to {project.title}
-      </Title>
-      <form onSubmit={handleSubmit} encType="multipart/form-data">
-        <Stack spacing="md">
-          <TextInput
-            label="Title"
-            placeholder="Enter bug title"
-            value={data.title}
-            onChange={(e) => setData('title', e.target.value)}
-            error={errors.title}
-          />
-
-          <Textarea
-            label="Description"
-            placeholder="Describe the bug"
-            value={data.description}
-            onChange={(e) => setData('description', e.target.value)}
-            error={errors.description}
-          />
-
-          <Select
-            label="Creator"
-            placeholder="Select creator"
-            data={users.map((user) => ({
-              value: user.id.toString(),
-              label: user.username,
-            }))}
-            value={data.creator_id}
-            onChange={(value) => setData('creator_id', value)}
-            error={errors.creator_id}
-          />
-
-          <Select
-            label="Assignee"
-            placeholder="Select assignee"
-            data={users.map((user) => ({
-              value: user.id.toString(),
-              label: user.username,
-            }))}
-            value={data.assignee_id}
-            onChange={(value) => setData('assignee_id', value)}
-            error={errors.assignee_id}
-          />
-
-          <Select
-            label="Status"
-            placeholder="Select bug status"
-            data={[
-              { value: 'open', label: 'Open' },
-              { value: 'in_progress', label: 'In Progress' },
-              { value: 'resolved', label: 'Resolved' },
-              { value: 'closed', label: 'Closed' },
+    <form onSubmit={handleSubmit} encType="multipart/form-data">
+      <AppLayout title="Create Bug" user={auth.user}>
+        <Container size="xl" w="100%" py={32}>
+          <PageHeadings
+            title="Create New Bug"
+            description="Provide the details to log a new bug in this project."
+            breadcrumbs={[
+              {
+                label: 'Projects',
+                onClick: () => router.get(route('projects.index')),
+              },
+              {
+                label: project.title,
+                onClick: () => router.get(route('projects.show', project.id)),
+              },
+              {
+                label: 'Create Bug',
+                onClick: () =>
+                  router.get(route('projects.bugs.create', project.id)),
+              },
             ]}
-            value={data.status}
-            onChange={(value) => setData('status', value)}
-            error={errors.status}
           />
 
-          <Select
-            label="Bug Type"
-            placeholder="Select bug type"
-            data={[
-              { value: 'critical', label: 'Critical' },
-              { value: 'major', label: 'Major' },
-              { value: 'minor', label: 'Minor' },
-            ]}
-            value={data.bug_type}
-            onChange={(value) => setData('bug_type', value)}
-            error={errors.bug_type}
-          />
+          <Grid gutter={32} justify="flex-end">
+            {/* Title Field */}
+            <Grid.Col span={{ base: 12 }}>
+              <Grid gutter={8} align="start">
+                <Grid.Col span={{ base: 12, sm: 4 }}>
+                  <Title order={5}>Bug Title</Title>
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, sm: 8 }}>
+                  <TextInput
+                    placeholder="Enter the bug title"
+                    value={form.data.title}
+                    onChange={handleTitleChange}
+                    error={form.errors.title}
+                    withAsterisk
+                    leftSection={<IconBug />}
+                  />
+                  <Text size="sm" color="dimmed" mt={8}>
+                    Provide a concise and clear title for the bug.
+                  </Text>
+                </Grid.Col>
+              </Grid>
+            </Grid.Col>
 
-          <DatePickerInput
-            label="Deadline"
-            placeholder="Pick a deadline"
-            value={data.deadline}
-            onChange={(value) => setData('deadline', new Date(value))} // Set langsung ke data.deadline
-            error={errors.deadline}
-          />
+            {/* Description Field */}
+            <Grid.Col span={{ base: 12 }}>
+              <Grid gutter={8} align="start">
+                <Grid.Col span={{ base: 12, sm: 4 }}>
+                  <Title order={5}>Description</Title>
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, sm: 8 }}>
+                  <Textarea
+                    placeholder="Describe the bug in detail"
+                    value={form.data.description}
+                    onChange={handleDescriptionChange}
+                    error={form.errors.description}
+                    minRows={4}
+                    leftSection={<IconAlignJustified />}
+                  />
+                  <Text size="sm" color="dimmed" mt={8}>
+                    Include steps to reproduce, expected behavior, and any
+                    relevant details.
+                  </Text>
+                </Grid.Col>
+              </Grid>
+            </Grid.Col>
 
-          <FileInput
-            label="Screenshots"
-            placeholder="Upload screenshots"
-            multiple
-            onChange={(files) => setData('screenshots', files)}
-            error={errors.screenshots}
-          />
+            {/* Assign To Field */}
+            <Grid.Col span={{ base: 12 }}>
+              <Grid gutter={8} align="start">
+                <Grid.Col span={{ base: 12, sm: 4 }}>
+                  <Title order={5}>Assign To</Title>
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, sm: 8 }}>
+                  <Select
+                    placeholder="Select a user to assign this bug"
+                    value={form.data.assignee_id}
+                    onChange={handleAssigneeChange}
+                    data={users.map((user) => ({
+                      value: user.id,
+                      label: user.full_name,
+                    }))}
+                    error={form.errors.assignee_id}
+                    leftSection={<IconUser />}
+                  />
+                  <Text size="sm" color="dimmed" mt={8}>
+                    Choose a user responsible for addressing this bug.
+                  </Text>
+                </Grid.Col>
+              </Grid>
+            </Grid.Col>
 
-          <Group position="right">
-            <Button type="submit" color="blue" loading={processing}>
-              Save
-            </Button>
-            <Button
-              variant="default"
-              onClick={() =>
-                router.get(route('projects.bugs.index', project.id))
-              }
-            >
-              Cancel
-            </Button>
-          </Group>
-        </Stack>
-      </form>
-    </AppLayout>
+            {/* Evidence Image Dropzone */}
+            <Grid.Col span={{ base: 12 }}>
+              <Grid gutter={8} align="start">
+                <Grid.Col span={{ base: 12, sm: 4 }}>
+                  <Title order={5}>Evidence Image</Title>
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, sm: 8 }}>
+                  <Dropzone
+                    onDrop={handleDropzoneChange}
+                    maxSize={5 * 1024 ** 2}
+                    accept={IMAGE_MIME_TYPE}
+                  >
+                    <Group
+                      justify="center"
+                      gap="xl"
+                      mih={220}
+                      style={{ pointerEvents: 'none' }}
+                    >
+                      <Dropzone.Accept>
+                        <IconUpload
+                          size={52}
+                          color="var(--mantine-color-blue-6)"
+                          stroke={1.5}
+                        />
+                      </Dropzone.Accept>
+                      <Dropzone.Reject>
+                        <IconX
+                          size={52}
+                          color="var(--mantine-color-red-6)"
+                          stroke={1.5}
+                        />
+                      </Dropzone.Reject>
+                      <Dropzone.Idle>
+                        <IconPhoto
+                          size={52}
+                          color="var(--mantine-color-dimmed)"
+                          stroke={1.5}
+                        />
+                      </Dropzone.Idle>
+
+                      <div>
+                        <Text size="xl" inline>
+                          Drag images here or click to select files
+                        </Text>
+                        <Text size="sm" color="dimmed" inline mt={7}>
+                          Attach as many files as you like, each file should not
+                          exceed 5MB
+                        </Text>
+                      </div>
+                    </Group>
+                  </Dropzone>
+                  {form.errors.evidence_image && (
+                    <Text size="sm" color="red" mt={8}>
+                      {form.errors.evidence_image}
+                    </Text>
+                  )}
+                </Grid.Col>
+              </Grid>
+            </Grid.Col>
+
+            {/* Submit Button */}
+            <Grid.Col span={{ base: 12, sm: 8, smOffset: 4 }}>
+              <Button
+                type="submit"
+                fullWidth
+                leftSection={<IconCornerDownLeft />}
+                disabled={
+                  form.processing || !form.data.title || !form.data.description
+                }
+                loading={form.processing}
+              >
+                Create Bug
+              </Button>
+            </Grid.Col>
+          </Grid>
+        </Container>
+      </AppLayout>
+    </form>
   );
 };
 
-export default Create;
+export default CreateBug;

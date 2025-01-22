@@ -41,15 +41,49 @@ const Edit = (props) => {
     return null;
   };
 
-  const handleChange = (field) => (e) => {
-    const value = Array.isArray(e) ? e : e.target.value;
-    form.setData(field, value);
+  const handleTitleChange = (e) => {
+    const value = e.target.value;
+    form.setData('title', value);
 
-    const error = validateField(field, value);
+    const error = validateField('title', value);
     if (error) {
-      form.setError(field, error);
+      form.setError('title', error);
     } else {
-      form.clearErrors(field);
+      form.clearErrors('title');
+    }
+  };
+
+  const handleDescriptionChange = (e) => {
+    const value = e.target.value;
+    form.setData('description', value);
+
+    const error = validateField('description', value);
+    if (error) {
+      form.setError('description', error);
+    } else {
+      form.clearErrors('description');
+    }
+  };
+
+  const handleManagerChange = (value) => {
+    form.setData('manager_id', value);
+
+    const error = validateField('manager_id', value);
+    if (error) {
+      form.setError('manager_id', error);
+    } else {
+      form.clearErrors('manager_id');
+    }
+  };
+
+  const handleTeamMembersChange = (value) => {
+    form.setData('team_members', value);
+
+    const error = validateField('team_members', value);
+    if (error) {
+      form.setError('team_members', error);
+    } else {
+      form.clearErrors('team_members');
     }
   };
 
@@ -71,7 +105,7 @@ const Edit = (props) => {
     {
       label: 'Title',
       value: form.data.title,
-      onChange: handleChange('title'),
+      onChange: handleTitleChange,
       error: form.errors.title,
       placeholder: "Enter the project's title, e.g., Website Redesign",
       description: 'Provide a concise and descriptive title for the project.',
@@ -81,7 +115,7 @@ const Edit = (props) => {
     {
       label: 'Description',
       value: form.data.description,
-      onChange: handleChange('description'),
+      onChange: handleDescriptionChange,
       error: form.errors.description,
       placeholder: "Describe the project's objectives and scope",
       description:
@@ -93,7 +127,7 @@ const Edit = (props) => {
     {
       label: 'Manager',
       value: form.data.manager_id,
-      onChange: handleChange('manager_id'),
+      onChange: handleManagerChange,
       error: form.errors.manager_id,
       placeholder: 'Select a project manager',
       description: 'Assign a manager who will oversee the project.',
@@ -107,7 +141,7 @@ const Edit = (props) => {
     {
       label: 'Team Members',
       value: form.data.team_members,
-      onChange: handleChange('team_members'),
+      onChange: handleTeamMembersChange,
       error: form.errors.team_members,
       placeholder: 'Select team members',
       description:
@@ -147,14 +181,14 @@ const Edit = (props) => {
             ]}
           />
 
-          <Grid gutter={16} justify="flex-end">
+          <Grid gutter={32} justify="flex-end">
             {fields.map(
               (
                 { component: Component, label, description, ...restField },
                 index,
               ) => (
                 <Grid.Col key={index} span={{ base: 12 }}>
-                  <Grid gutter={{ base: 8, sm: 0 }} align="center">
+                  <Grid gutter={{ base: 8, sm: 0 }} align="start">
                     <Grid.Col span={{ base: 12, sm: 4 }}>
                       <Title order={5}>{label}</Title>
                     </Grid.Col>
