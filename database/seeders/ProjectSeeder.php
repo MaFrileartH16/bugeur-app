@@ -18,15 +18,11 @@ class ProjectSeeder extends Seeder
       ->inRandomOrder()
       ->get();
 
-    if ($managers->isEmpty()) {
-      $this->command->warn('No project managers available to assign to projects.');
-      return;
-    }
+    // Pilih beberapa tahun secara acak dari rentang tahun
+    $availableYears = range(2015, now()->year); // Tahun antara 2015 sampai sekarang
+    $selectedYears = collect($availableYears)->random(rand(3, count($availableYears)))->sort()->values(); // Pilih 3-10 tahun secara acak
 
-    $startYear = 2015; // Tahun awal
-    $endYear = now()->year; // Tahun saat ini
-
-    foreach (range($startYear, $endYear) as $year) {
+    foreach ($selectedYears as $year) {
       foreach (range(1, 12) as $month) { // Iterasi setiap bulan dalam tahun
         $totalProjects = rand(5, 15); // Total proyek acak per bulan
         $inactiveCount = rand(1, $totalProjects - 1); // Set jumlah inactive (minimal 1, maksimal total-1)

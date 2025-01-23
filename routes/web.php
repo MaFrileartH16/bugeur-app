@@ -47,7 +47,7 @@ Route::middleware('auth')->group(function () {
 
               return [
                 $monthName => [
-                  'total' => $totalByMonth, // Tambahkan total proyek per bulan
+                  'Total' => $totalByMonth, // Tambahkan total proyek per bulan
                   'Active' => $projectsByMonth->whereNull('deleted_at')->count(),
                   'Inactive' => $projectsByMonth->whereNotNull('deleted_at')->count(),
                 ],
@@ -63,31 +63,34 @@ Route::middleware('auth')->group(function () {
       'total' => User::withTrashed()->where('role', '!=', 'Admin')->count(), // Semua pengguna termasuk yang soft deleted
       'details' => [
         'Project Manager' => [
-          'Active' => User::where('role', 'project_manager')
+          'Active' => $activeProjectManager = User::where('role', 'project_manager')
             ->whereNull('deleted_at') // Hanya yang aktif
             ->count(),
-          'Inactive' => User::withTrashed()
+          'Inactive' => $inactiveProjectManager = User::withTrashed()
             ->where('role', 'project_manager')
             ->whereNotNull('deleted_at') // Hanya yang soft deleted
             ->count(),
+          'Total' => $activeProjectManager + $inactiveProjectManager, // Total per role
         ],
         'Developer' => [
-          'Active' => User::where('role', 'developer')
+          'Active' => $activeDeveloper = User::where('role', 'developer')
             ->whereNull('deleted_at')
             ->count(),
-          'Inactive' => User::withTrashed()
+          'Inactive' => $inactiveDeveloper = User::withTrashed()
             ->where('role', 'developer')
             ->whereNotNull('deleted_at')
             ->count(),
+          'Total' => $activeDeveloper + $inactiveDeveloper, // Total per role
         ],
         'Quality Assurance' => [
-          'Active' => User::where('role', 'quality_assurance')
+          'Active' => $activeQA = User::where('role', 'quality_assurance')
             ->whereNull('deleted_at')
             ->count(),
-          'Inactive' => User::withTrashed()
+          'Inactive' => $inactiveQA = User::withTrashed()
             ->where('role', 'quality_assurance')
             ->whereNotNull('deleted_at')
             ->count(),
+          'Total' => $activeQA + $inactiveQA, // Total per role
         ],
       ],
     ];

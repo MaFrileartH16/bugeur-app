@@ -26,18 +26,7 @@ const Dashboard = (props) => {
     new Date().getFullYear().toString(),
   );
 
-  console.log(
-    Object.entries(props.projects.details)
-      .filter(([year]) => year === selectedYear.toString()) // Filter hanya tahun yang dipilih
-      .flatMap(([, data]) =>
-        Object.entries(data.months).map(([month, { Active, Inactive }]) => ({
-          year: selectedYear,
-          month,
-          active: Active,
-          inactive: Inactive,
-        })),
-      ),
-  );
+  console.log(props);
   const data = [
     {
       label: 'Total Projects',
@@ -157,8 +146,8 @@ const Dashboard = (props) => {
                   .filter(([year]) => year === selectedYear.toString()) // Filter hanya tahun yang dipilih
                   .flatMap(([, data]) =>
                     Object.entries(data.months).map(
-                      ([month, { total, Active, Inactive }]) => ({
-                        month: `${month} (${total})`, // Format nama bulan dengan total
+                      ([month, { Total, Active, Inactive }]) => ({
+                        month: `${month} (${Total})`, // Format nama bulan dengan total
                         active: Active,
                         inactive: Inactive,
                       }),
@@ -182,7 +171,7 @@ const Dashboard = (props) => {
                 gridAxis="xy"
                 withLegend
                 withPointLabels
-                xAxisLabel="Month (projects)"
+                xAxisLabel="Month (Total projects)"
                 yAxisLabel="Total"
                 valueFormatter={(value) =>
                   new Intl.NumberFormat('id-ID').format(value)
@@ -213,8 +202,8 @@ const Dashboard = (props) => {
             <BarChart
               h={500}
               data={Object.entries(props.users.details).map(
-                ([role, { Active, Inactive }]) => ({
-                  role,
+                ([role, { Total, Active, Inactive }]) => ({
+                  role: `${role} (${Total})`,
                   active: Active,
                   inactive: Inactive,
                 }),
@@ -222,7 +211,7 @@ const Dashboard = (props) => {
               dataKey="role"
               type="stacked"
               withLegend
-              xAxisLabel="Role"
+              xAxisLabel="Role (Total users)"
               yAxisLabel="Total"
               tooltipAnimationDuration={160}
               withBarValueLabel
