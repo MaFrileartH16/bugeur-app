@@ -17,7 +17,7 @@ class ProfileController extends Controller
   public function edit(Request $request): Response
   {
     return Inertia::render('Profile/Edit', [
-      'title' => 'Profile',
+      'title' => 'Edit Profile',
       'notification' => session()->pull('notification'),
     ]);
   }
@@ -29,7 +29,7 @@ class ProfileController extends Controller
   {
     // Validasi input
     $validated = $request->validate([
-      'avatar' => ['nullable', 'image', 'max:1024'], // Maksimal 1MB
+      'profile_photo_path' => ['nullable', 'image', 'max:1024'], // Maksimal 1MB
       'full_name' => ['required', 'string', 'max:255'],
       'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $request->user()->id],
       'password' => ['nullable', 'string', 'min:8'],
@@ -38,22 +38,22 @@ class ProfileController extends Controller
     $user = $request->user();
 
     // Tangani avatar (unggah file)
-    if ($request->hasFile('avatar')) {
+    if ($request->hasFile('profile_photo_path')) {
       // Hapus avatar lama jika ada
-      if ($user->avatar) {
-        Storage::disk('public')->delete($user->avatar);
+      if ($user->profile_photo_path) {
+        Storage::disk('public')->delete($user->profile_photo_path);
       }
 
       // Simpan avatar baru
-      $path = $request->file('avatar')->store('avatars', 'public');
-      $validated['avatar'] = $path;
+      $path = $request->file('profile_photo_path')->store('avatars', 'public');
+      $validated['profile_photo_path'] = $path;
     } else {
-      unset($validated['avatar']);
+      unset($validated['profile_photo_path']);
     }
 
     // Perbarui data pengguna
     $user->fill([
-      'avatar' => $validated['avatar'] ?? $user->avatar, // Tetap gunakan avatar lama jika tidak ada unggahan baru
+      'profile_photo_path' => $validated['profile_photo_path'] ?? $user->profile_photo_path, // Tetap gunakan avatar lama jika tidak ada unggahan baru
       'full_name' => $validated['full_name'],
       'email' => $validated['email'],
     ]);

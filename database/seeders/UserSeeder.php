@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
         'role' => $role,
       ]);
 
-      $additionalUsers = random_int(5, 20);
+      $additionalUsers = random_int(1, 16);
       User::factory($additionalUsers)->create([
         'role' => $role,
       ])->each(function ($user) {

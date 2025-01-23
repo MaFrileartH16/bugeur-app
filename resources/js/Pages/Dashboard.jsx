@@ -21,22 +21,25 @@ import {
 import { useState } from 'react';
 
 const Dashboard = (props) => {
-  const authUser = props.auth.user;
+  console.log(props);
+  const authUser = props.auth?.user || {}; // Default ke objek kosong jika auth atau user tidak tersedia
   const [selectedYear, setSelectedYear] = useState(
     new Date().getFullYear().toString(),
   );
 
-  console.log(props);
+  const projects = props.projects || { total: 0, details: {} }; // Default untuk projects
+  const users = props.users || { total: 0, details: {} }; // Default untuk users
+
   const data = [
     {
       label: 'Total Projects',
-      value: props.projects.total,
+      value: projects.total, // Gunakan total projects dengan default 0
       icon: <IconFolder size={24} />,
       onClick: () => router.get(route('projects.index')),
     },
     {
       label: 'Total Bugs',
-      value: 0,
+      value: 0, // Default bugs (karena belum ada data bugs)
       icon: <IconBug size={24} />,
       onClick:
         authUser.role !== 'Admin'
@@ -48,7 +51,7 @@ const Dashboard = (props) => {
   if (authUser.role === 'Admin') {
     data.unshift({
       label: 'Total Users',
-      value: props.users.total,
+      value: users.total, // Gunakan total users dengan default 0
       icon: <IconUser size={24} />,
       onClick: () => router.get(route('users.index')),
     });
@@ -58,7 +61,7 @@ const Dashboard = (props) => {
     <AppLayout
       title="Dashboard"
       user={authUser}
-      notification={props.notification}
+      notification={props.notification || null} // Default notification ke null
     >
       <PageHeadings
         title="Dashboard"
@@ -119,7 +122,6 @@ const Dashboard = (props) => {
                 <Text fw={500} fz={20}>
                   Projects
                 </Text>
-
                 <Select
                   leftSection={<IconCalendarTime />}
                   onChange={(value) => {
@@ -131,39 +133,36 @@ const Dashboard = (props) => {
                   }}
                   placeholder="Select a year"
                   defaultValue={selectedYear}
-                  data={Object.entries(props.projects.details)
+                  data={Object.entries(projects.details)
                     .sort(([yearA], [yearB]) => yearB - yearA) // Sorting descending berdasarkan tahun
                     .map(([year, data]) => ({
                       value: year, // Gunakan tahun sebagai value
-                      label: `${year} (${data.total} projects)`, // Tampilkan tahun dan total proyek di label
+                      label: `${year} (${data.total || 0} projects)`, // Default total ke 0 jika undefined
                     }))}
                 />
               </Group>
-
               <LineChart
-                h={500}
-                data={Object.entries(props.projects.details)
+                h={320}
+                data={Object.entries(projects.details)
                   .filter(([year]) => year === selectedYear.toString()) // Filter hanya tahun yang dipilih
                   .flatMap(([, data]) =>
-                    Object.entries(data.months).map(
-                      ([month, { Total, Active, Inactive }]) => ({
+                    Object.entries(data.months || {}).map(
+                      ([month, { Total = 0, Active = 0, Inactive = 0 }]) => ({
                         month: `${month} (${Total})`, // Format nama bulan dengan total
-                        active: Active,
-                        inactive: Inactive,
+                        Active,
+                        Inactive,
                       }),
                     ),
                   )}
                 dataKey="month"
                 series={[
                   {
-                    name: 'active',
-                    label: 'Active',
-                    color: '#77DD77',
+                    name: 'Active',
+                    color: 'green',
                   },
                   {
-                    name: 'inactive',
-                    label: 'Inactive',
-                    color: '#FF6961',
+                    name: 'Inactive',
+                    color: 'red',
                   },
                 ]}
                 curveType="natural"
@@ -179,15 +178,9 @@ const Dashboard = (props) => {
                 tooltipAnimationDuration={160}
               />
             </Paper>
-
-            {/* Chart 2: Bugs */}
-            <Paper shadow="sm" style={{ height: 200 }}>
-              Chart: Bugs
-            </Paper>
           </Stack>
         </Grid.Col>
 
-        {/* Chart: Users menggunakan colSpan */}
         <Grid.Col
           span={{
             base: 12,
@@ -201,11 +194,11 @@ const Dashboard = (props) => {
 
             <BarChart
               h={500}
-              data={Object.entries(props.users.details).map(
-                ([role, { Total, Active, Inactive }]) => ({
+              data={Object.entries(users.details).map(
+                ([role, { Total = 0, Active = 0, Inactive = 0 }]) => ({
                   role: `${role} (${Total})`,
-                  active: Active,
-                  inactive: Inactive,
+                  Active,
+                  Inactive,
                 }),
               )}
               dataKey="role"
@@ -217,14 +210,12 @@ const Dashboard = (props) => {
               withBarValueLabel
               series={[
                 {
-                  name: 'active',
-                  label: 'Active',
-                  color: '#77DD77',
+                  name: 'Active',
+                  color: 'green',
                 },
                 {
-                  name: 'inactive',
-                  label: 'Inactive',
-                  color: '#FF6961',
+                  name: 'Inactive',
+                  color: 'red',
                 },
               ]}
               tickLine="xy"

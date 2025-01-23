@@ -8,8 +8,8 @@ export const UserMenu = ({ user }) => {
     <Menu shadow="xs" position="bottom-end" withArrow arrowPosition="center">
       <Menu.Target style={{ cursor: 'pointer' }}>
         <Box pos="relative">
-          <Avatar color="crystal" size={48} src={user.avatar || undefined}>
-            {!user.avatar && getInitialName(user.full_name)}
+          <Avatar size={48} src={user.profile_photo_path || undefined}>
+            {!user.profile_photo_path && getInitialName(user.full_name)}
           </Avatar>
 
           <Badge

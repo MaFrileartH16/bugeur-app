@@ -25,7 +25,7 @@ class User extends Authenticatable
    * @var list<string>
    */
   protected $fillable = [
-    'avatar',
+    'profile_photo_path',
     'full_name',
     'email',
     'role',
@@ -99,9 +99,9 @@ class User extends Authenticatable
       ->implode(' ');
   }
 
-  public function getAvatarAttribute(): string
+  public function getProfilePhotoPathAttribute(): string
   {
-    return asset('storage/' . $this->attributes['avatar']);
+    return asset('storage/' . $this->attributes['profile_photo_path']);
   }
 
   /**

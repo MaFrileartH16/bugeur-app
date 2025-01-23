@@ -25,13 +25,13 @@ const Edit = (props) => {
   const { user } = props.auth;
   const form = useForm({
     _method: 'put',
-    avatar: user.avatar || '',
+    profile_photo_path: user.profile_photo_path || '',
     full_name: user.full_name || '',
     email: user.email || '',
     password: '',
   });
 
-  const validateAvatar = (file) => {
+  const validateProfilePhoto = (file) => {
     if (file && !['image/png', 'image/jpeg', 'image/jpg'].includes(file.type)) {
       return 'Only PNG, JPEG, and JPG formats are allowed.';
     }
@@ -41,14 +41,14 @@ const Edit = (props) => {
     return null;
   };
 
-  const handleAvatarChange = (file) => {
-    const error = validateAvatar(file);
+  const handleProfilePhotoChange = (file) => {
+    const error = validateProfilePhoto(file);
     if (error) {
-      form.setError('avatar', error);
+      form.setError('profile_photo_path', error);
       return;
     }
-    form.setData('avatar', file);
-    form.clearErrors('avatar');
+    form.setData('profile_photo_path', file);
+    form.clearErrors('profile_photo_path');
   };
 
   const validateEmail = (value) => {
@@ -95,29 +95,30 @@ const Edit = (props) => {
       >
         <PageHeadings
           title="Edit Profile"
-          description="Update your profile details and preferences."
+          description="Update your profile details."
         />
 
         <Grid gutter={16} justify="flex-end">
           <Grid.Col span={{ base: 12 }}>
             <Grid gutter={8} align="start">
+              {/* Hapus gutter di sini */}
               <Grid.Col span={{ base: 12, sm: 4 }}>
-                <Title order={5}>Profile Picture</Title>
+                <Title order={5}>Profile Photo</Title>
               </Grid.Col>
               <Grid.Col span={{ base: 12, sm: 8 }}>
                 <Group align="flex-start" spacing="sm">
                   <Avatar
                     src={
-                      form.data.avatar instanceof File
-                        ? URL.createObjectURL(form.data.avatar)
-                        : form.data.avatar
+                      form.data.profile_photo_path instanceof File
+                        ? URL.createObjectURL(form.data.profile_photo_path)
+                        : form.data.profile_photo_path
                     }
-                    alt="Profile Picture"
+                    alt="Profile Photo"
                     size={80}
                   />
 
                   <FileButton
-                    onChange={handleAvatarChange}
+                    onChange={handleProfilePhotoChange}
                     accept="image/png,image/jpeg,image/jpg"
                   >
                     {(props) => (
@@ -131,9 +132,9 @@ const Edit = (props) => {
                     )}
                   </FileButton>
                 </Group>
-                {form.errors.avatar && (
+                {form.errors.profile_photo_path && (
                   <Text color="red" size="sm">
-                    {form.errors.avatar}
+                    {form.errors.profile_photo_path}
                   </Text>
                 )}
               </Grid.Col>
@@ -141,15 +142,15 @@ const Edit = (props) => {
           </Grid.Col>
 
           <Grid.Col span={{ base: 12 }}>
-            <Grid gutter={8} align="start">
+            <Grid align="start" gutter={0}>
               <Grid.Col span={{ base: 12, sm: 4 }}>
                 <Title order={5}>Full Name</Title>
               </Grid.Col>
               <Grid.Col span={{ base: 12, sm: 8 }}>
                 <TextInput
                   value={form.data.full_name}
-                  placeholder="John Doe"
-                  description="Your full name as displayed on your profile."
+                  placeholder="Enter your full name"
+                  description="Your name cannot be changed. Contact support if you need to update it."
                   leftSection={<IconUser />}
                   readOnly
                   disabled
@@ -159,15 +160,15 @@ const Edit = (props) => {
           </Grid.Col>
 
           <Grid.Col span={{ base: 12 }}>
-            <Grid gutter={8} align="start">
+            <Grid align="start" gutter={0}>
               <Grid.Col span={{ base: 12, sm: 4 }}>
                 <Title order={5}>Role</Title>
               </Grid.Col>
               <Grid.Col span={{ base: 12, sm: 8 }}>
                 <TextInput
                   value={user.role}
-                  placeholder="Role"
-                  description="Your system role."
+                  placeholder="Your role"
+                  description="This is your system role and cannot be changed."
                   leftSection={<IconKey />}
                   readOnly
                   disabled
@@ -177,7 +178,7 @@ const Edit = (props) => {
           </Grid.Col>
 
           <Grid.Col span={{ base: 12 }}>
-            <Grid gutter={8} align="start">
+            <Grid align="start" gutter={0}>
               <Grid.Col span={{ base: 12, sm: 4 }}>
                 <Title order={5}>Email</Title>
               </Grid.Col>
@@ -187,7 +188,7 @@ const Edit = (props) => {
                   onChange={handleChangeEmail}
                   error={form.errors.email}
                   placeholder="example@bugeur.id"
-                  description="Your email address."
+                  description="Your email address is tied to your account and cannot be changed."
                   leftSection={<IconMail />}
                   readOnly
                   disabled
@@ -197,17 +198,17 @@ const Edit = (props) => {
           </Grid.Col>
 
           <Grid.Col span={{ base: 12 }}>
-            <Grid gutter={8} align="start">
+            <Grid align="start" gutter={0}>
               <Grid.Col span={{ base: 12, sm: 4 }}>
-                <Title order={5}>Password</Title>
+                <Title order={5}>New Password</Title>
               </Grid.Col>
               <Grid.Col span={{ base: 12, sm: 8 }}>
                 <PasswordInput
                   value={form.data.password}
                   onChange={handleChangePassword}
                   error={form.errors.password}
-                  placeholder="Enter new password"
-                  description="Leave blank to keep current password."
+                  placeholder="Enter a new password"
+                  description="Password must be at least 8 characters long."
                   leftSection={<IconPassword />}
                 />
               </Grid.Col>

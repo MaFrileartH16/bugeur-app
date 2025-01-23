@@ -7,7 +7,6 @@ import {
   Badge,
   Button,
   Card,
-  Container,
   Flex,
   Grid,
   Group,
@@ -142,148 +141,146 @@ const Index = (props) => {
         </SimpleGrid>
       </Modal>
 
-      <Container flex={1} size="xl" w="100%" my={32}>
-        <Flex justify="space-between" align="start" gap={16}>
-          <PageHeadings
-            title="Users"
-            description="View, manage, and assign roles to user accounts within the system."
-          />
+      <Flex justify="space-between" align="start" gap={16}>
+        <PageHeadings
+          title="Users"
+          description="View, manage, and assign roles to user accounts within the system."
+        />
 
-          <Tooltip label="Craete User">
-            <ActionIcon
-              display={{
-                base: 'block',
-                xs: 'none',
-              }}
-              onClick={() => router.get(route('users.create'))}
-            >
-              <IconPlus />
-            </ActionIcon>
-          </Tooltip>
-
-          <Button
-            leftSection={<IconPlus />}
+        <Tooltip label="Craete User">
+          <ActionIcon
             display={{
-              base: 'none',
-              xs: 'block',
+              base: 'block',
+              xs: 'none',
             }}
             onClick={() => router.get(route('users.create'))}
           >
-            Create User
-          </Button>
-        </Flex>
+            <IconPlus />
+          </ActionIcon>
+        </Tooltip>
 
-        <Card withBorder shadow="xs">
-          <Card.Section withBorder p={16}>
-            <TextInput
-              leftSection={<IconSearch />}
-              placeholder="Search by name, email, or role..."
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-            />
-          </Card.Section>
+        <Button
+          leftSection={<IconPlus />}
+          display={{
+            base: 'none',
+            xs: 'block',
+          }}
+          onClick={() => router.get(route('users.create'))}
+        >
+          Create User
+        </Button>
+      </Flex>
 
-          {users.length === 0 ? (
-            renderEmptyState()
-          ) : filteredUsers.length === 0 ? (
-            renderNotFound()
-          ) : (
-            <Grid pt={16} gutter="lg">
-              {filteredUsers.map((user) => (
-                <Grid.Col
-                  key={user.id}
-                  span={{
-                    base: 12,
-                    sm: 6,
-                    md: 4,
-                    lg: 3,
-                  }}
-                >
-                  <Card shadow="xs" radius="md" withBorder>
-                    <Menu
-                      shadow="xl"
-                      position="bottom-end"
-                      withArrow
-                      arrowPosition="center"
-                    >
-                      <Menu.Target>
-                        <ActionIcon
-                          pos="absolute"
-                          variant="subtle"
-                          color="ghost"
-                          right={16}
+      <Card withBorder shadow="xs">
+        <Card.Section withBorder p={16}>
+          <TextInput
+            leftSection={<IconSearch />}
+            placeholder="Search by name, email, or role..."
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+          />
+        </Card.Section>
+
+        {users.length === 0 ? (
+          renderEmptyState()
+        ) : filteredUsers.length === 0 ? (
+          renderNotFound()
+        ) : (
+          <Grid pt={16} gutter="lg">
+            {filteredUsers.map((user) => (
+              <Grid.Col
+                key={user.id}
+                span={{
+                  base: 12,
+                  sm: 6,
+                  md: 4,
+                  lg: 3,
+                }}
+              >
+                <Card shadow="xs" radius="md" withBorder>
+                  <Menu
+                    shadow="xl"
+                    position="bottom-end"
+                    withArrow
+                    arrowPosition="center"
+                  >
+                    <Menu.Target>
+                      <ActionIcon
+                        pos="absolute"
+                        variant="subtle"
+                        color="ghost"
+                        right={16}
+                      >
+                        <IconDotsVertical />
+                      </ActionIcon>
+                    </Menu.Target>
+                    <Menu.Dropdown p={0}>
+                      {menuItems.map((item, index) => (
+                        <Menu.Item
+                          key={index}
+                          leftSection={item.leftSection}
+                          onClick={() => item.action(user)}
+                          color={item.color || undefined}
+                          h={48}
                         >
-                          <IconDotsVertical />
-                        </ActionIcon>
-                      </Menu.Target>
-                      <Menu.Dropdown p={0}>
-                        {menuItems.map((item, index) => (
-                          <Menu.Item
-                            key={index}
-                            leftSection={item.leftSection}
-                            onClick={() => item.action(user)}
-                            color={item.color || undefined}
-                            h={48}
-                          >
-                            {item.label}
-                          </Menu.Item>
-                        ))}
-                      </Menu.Dropdown>
-                    </Menu>
+                          {item.label}
+                        </Menu.Item>
+                      ))}
+                    </Menu.Dropdown>
+                  </Menu>
 
-                    <Avatar
-                      mx="auto"
-                      size={64}
-                      color={
-                        user.role === 'Project Manager'
-                          ? 'magic'
-                          : user.role === 'Developer'
-                            ? 'peach'
-                            : user.role === 'Quality Assurance'
-                              ? 'soap'
-                              : 'default'
-                      }
-                    >
-                      {getInitials(user.full_name)}
-                    </Avatar>
-                    <Title order={3} align="center" mt={16} lineClamp={1}>
-                      {user.full_name}
-                    </Title>
-                    <Text align="center" c="ghost" size="sm" mb={16}>
-                      {user.email}
-                    </Text>
-                    <Badge
-                      mx="auto"
-                      color={
-                        user.role === 'Project Manager'
-                          ? 'magic'
-                          : user.role === 'Developer'
-                            ? 'peach'
-                            : user.role === 'Quality Assurance'
-                              ? 'soap'
-                              : 'default'
-                      }
-                      variant="light"
-                    >
-                      {user.role}
-                    </Badge>
-                  </Card>
-                </Grid.Col>
-              ))}
-            </Grid>
-          )}
+                  <Avatar
+                    mx="auto"
+                    size={64}
+                    color={
+                      user.role === 'Project Manager'
+                        ? 'magic'
+                        : user.role === 'Developer'
+                          ? 'peach'
+                          : user.role === 'Quality Assurance'
+                            ? 'soap'
+                            : 'default'
+                    }
+                  >
+                    {getInitials(user.full_name)}
+                  </Avatar>
+                  <Title order={3} align="center" mt={16} lineClamp={1}>
+                    {user.full_name}
+                  </Title>
+                  <Text align="center" c="ghost" size="sm" mb={16}>
+                    {user.email}
+                  </Text>
+                  <Badge
+                    mx="auto"
+                    color={
+                      user.role === 'Project Manager'
+                        ? 'magic'
+                        : user.role === 'Developer'
+                          ? 'peach'
+                          : user.role === 'Quality Assurance'
+                            ? 'soap'
+                            : 'default'
+                    }
+                    variant="light"
+                  >
+                    {user.role}
+                  </Badge>
+                </Card>
+              </Grid.Col>
+            ))}
+          </Grid>
+        )}
 
-          <Group justify="space-between" align="center" mt={16}>
-            <Text size="sm">{message}</Text>
-            <Pagination
-              value={activePage}
-              onChange={handlePageChange}
-              total={last_page}
-              radius="xs"
-            />
-          </Group>
-        </Card>
-      </Container>
+        <Group justify="space-between" align="center" mt={16}>
+          <Text size="sm">{message}</Text>
+          <Pagination
+            value={activePage}
+            onChange={handlePageChange}
+            total={last_page}
+            radius="xs"
+          />
+        </Group>
+      </Card>
     </AppLayout>
   );
 };

@@ -14,6 +14,7 @@ import {
 
 export const theme = createTheme({
   colors: {
+    navy: generateColors('#000080'),
     crystal: generateColors('#A8DADC'),
     macaroni: generateColors('#FFB385'),
     ghost: generateColors('#F8F9FA'),
@@ -22,7 +23,7 @@ export const theme = createTheme({
     soap: generateColors('#D4D8F0'),
   },
   fontFamily: 'Fredoka, serif',
-  primaryColor: 'crystal',
+  primaryColor: 'navy',
   headings: {
     sizes: {
       h1: { fontSize: '44px', fontWeight: '700', lineHeight: '56px' },
@@ -144,6 +145,7 @@ export const theme = createTheme({
     Avatar: Avatar.extend({
       defaultProps: {
         radius: 16,
+        color: 'navy',
       },
     }),
     MultiSelect: MultiSelect.extend({
