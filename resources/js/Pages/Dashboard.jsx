@@ -123,6 +123,10 @@ const Dashboard = (props) => {
                   Projects
                 </Text>
                 <Select
+                  w={{
+                    base: '100%',
+                    xs: 'auto',
+                  }}
                   leftSection={<IconCalendarTime />}
                   onChange={(value) => {
                     if (value === null) {

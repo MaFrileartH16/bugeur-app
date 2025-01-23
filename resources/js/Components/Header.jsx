@@ -9,7 +9,7 @@ export const Header = (props) => {
       pos="sticky"
       top={0}
       style={{
-        zIndex: 3,
+        zIndex: 201,
       }}
       bg="white"
     >

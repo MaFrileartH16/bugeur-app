@@ -1,13 +1,15 @@
-import { Container, Divider } from '@mantine/core';
+import { Center, Divider, Text } from '@mantine/core';
 
 export const Footer = () => {
   return (
     <>
       <Divider />
 
-      <Container py={16} align="center">
-        © {new Date().getFullYear()} Bugeur. All rights reserved.
-      </Container>
+      <Center h={80} px={16}>
+        <Text fw={500} align="center">
+          © {new Date().getFullYear()} Bugeur. All rights reserved.
+        </Text>
+      </Center>
     </>
   );
 };

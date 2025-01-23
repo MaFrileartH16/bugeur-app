@@ -17,17 +17,52 @@ class UserController extends Controller
    */
   public function index(): Response
   {
-    $cacheKey = 'users_index_page_' . request('page', 1);
+    $cacheKey = 'users_index_page_' . request('page', 1) . '_search_' . request('search') . '_sort_' . request('sort_key') . '_direction_' . request('sort_direction') . '_filter_type_' . request('filter_type') . '_filter_value_' . request('filter_value') . '_per_page_' . request('per_page', 10);
 
     $users = cache()->remember($cacheKey, now()->addMinutes(10), function () {
-      return User::where('role', '!=', 'admin')
-        ->orderBy('full_name', 'asc')
-        ->paginate(16);
+      $query = User::withTrashed()->where('role', '!=', 'admin'); // Mengambil data termasuk soft deleted
+
+      // Filter berdasarkan pencarian
+      if (request('search')) {
+        $query->where(function ($q) {
+          $q->where('full_name', 'like', '%' . request('search') . '%')
+            ->orWhere('email', 'like', '%' . request('search') . '%');
+        });
+      }
+
+      // Filter berdasarkan tipe filter
+      if (request('filter_type') && request('filter_value')) {
+        if (request('filter_type') === 'role') {
+          $query->where('role', request('filter_value')); // Filter berdasarkan role
+        } elseif (request('filter_type') === 'status') {
+          if (request('filter_value') === 'active') {
+            $query->whereNull('deleted_at'); // Hanya data yang aktif
+          } elseif (request('filter_value') === 'inactive') {
+            $query->whereNotNull('deleted_at'); // Hanya data yang tidak aktif
+          }
+        }
+      }
+
+      // Sorting
+      if (request('sort_key') && request('sort_direction')) {
+        $query->orderBy(request('sort_key'), request('sort_direction'));
+      } else {
+        $query->orderBy('full_name', 'asc'); // Default sorting
+      }
+
+      // Pagination dengan custom per_page
+      return $query->paginate(request('per_page', 10));
     });
 
     return Inertia::render('Users/Index', [
       'title' => 'Users',
       'users' => $users,
+      'search' => request('search'), // Kirim parameter search ke frontend
+      'sort_key' => request('sort_key'), // Kirim parameter sort_key ke frontend
+      'sort_direction' => request('sort_direction'), // Kirim parameter sort_direction ke frontend
+      'filter_type' => request('filter_type'), // Kirim parameter filter_type ke frontend
+      'filter_value' => request('filter_value'), // Kirim parameter filter_value ke frontend
+      'per_page' => request('per_page', 10), // Kirim parameter per_page ke frontend
       'notification' => session()->pull('notification'),
     ]);
   }

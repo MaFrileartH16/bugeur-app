@@ -114,6 +114,9 @@ export const theme = createTheme({
         nothingFoundMessage: 'Nothing found...',
       },
       styles: {
+        root: {
+          margin: 0,
+        },
         section: { width: 24, margin: '0 16px' },
         input: {
           padding: '0 16px 0px 56px',

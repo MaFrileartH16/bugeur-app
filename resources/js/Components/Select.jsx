@@ -1,6 +1,6 @@
-import { Text, TextInput as TextInputMantine } from '@mantine/core';
+import { Select as SelectMantine, Text } from '@mantine/core';
 
-export const TextInput = ({ description, error, ...props }) => {
+export const Select = ({ description, error, ...props }) => {
   return (
     <>
       {description && (
@@ -9,7 +9,7 @@ export const TextInput = ({ description, error, ...props }) => {
         </Text>
       )}
 
-      <TextInputMantine
+      <SelectMantine
         mt={description ? 0 : 8}
         {...props}
         styles={{
