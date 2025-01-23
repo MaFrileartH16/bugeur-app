@@ -10,6 +10,7 @@ export const PasswordInput = ({ description, error, ...props }) => {
       )}
 
       <PasswordInputMantine
+        mt={description ? 0 : 8}
         {...props}
         styles={{
           input: {

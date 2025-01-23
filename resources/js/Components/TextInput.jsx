@@ -8,6 +8,7 @@ export const TextInput = ({ description, error, ...props }) => {
       </Text>
 
       <TextInputMantine
+        mt={description ? 0 : 8}
         {...props}
         styles={{
           input: {

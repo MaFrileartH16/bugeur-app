@@ -106,10 +106,10 @@ export const theme = createTheme({
     }),
     Select: Select.extend({
       defaultProps: {
-        clearable: true,
         checkIconPosition: 'right',
         comboboxProps: { shadow: 'xs' },
         searchable: true,
+        allowDeselect: false,
         nothingFoundMessage: 'Nothing found...',
       },
       styles: {

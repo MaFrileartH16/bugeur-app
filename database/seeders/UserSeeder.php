@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 
 class UserSeeder extends Seeder
 {
@@ -18,24 +19,26 @@ class UserSeeder extends Seeder
         'full_name' => 'Admin',
         'email' => 'admin@bugeur.id',
         'role' => 'admin',
-        'password' => 'admin@bugeur.id'
+        'password' => 'admin@bugeur.id',
       ]);
     }
 
-    // Role lain yang harus di-generate
     $roles = ['project_manager', 'developer', 'quality_assurance'];
 
     foreach ($roles as $role) {
-      // Pastikan ada setidaknya 1 pengguna untuk setiap role
       User::factory()->create([
         'role' => $role,
       ]);
 
-      // Tambahkan jumlah pengguna acak untuk setiap role (1 hingga 20 tambahan)
-      $additionalUsers = random_int(1, 20);
+      $additionalUsers = random_int(5, 20);
       User::factory($additionalUsers)->create([
         'role' => $role,
-      ]);
+      ])->each(function ($user) {
+        if (rand(0, 1)) {
+          $user->deleted_at = Carbon::now()->subDays(rand(1, 365));
+          $user->save();
+        }
+      });
     }
   }
 }

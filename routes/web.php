@@ -4,7 +4,6 @@ use App\Http\Controllers\BugController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\UserController;
-use App\Models\Bug;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
@@ -14,61 +13,91 @@ Route::redirect('/', '/login');
 Route::middleware('auth')->group(function () {
   Route::get('/dashboard', function () {
     $user = auth()->user();
-
-    // Ambil proyek berdasarkan peran pengguna
     $projects = $user->role === 'Admin'
-      ? Project::all()
-      : Project::whereHas('workingOn', function ($query) use ($user) {
+      ? Project::withTrashed()->get()->unique('id') // Pastikan proyek unik
+      : Project::withTrashed()->whereHas('workingOn', function ($query) use ($user) {
         $query->where('user_id', $user->id);
-      })->get();
+      })->get()->unique('id');
 
-    // Hitung total bugs berdasarkan peran pengguna
-    $total_bugs = match ($user->role) {
-      'Admin' => Bug::count(),
-      'Quality Assurance' => Bug::where('creator_id', $user->id)->count(),
-      'Developer' => Bug::where('assignee_id', $user->id)->count(),
-      default => 0,
-    };
+// Proses data proyek
+    $projectsData = [
+      'total' => $projects->count(), // Total proyek unik
+      'details' => collect(range(
+        $projects->min('created_at')->format('Y'), // Tahun pertama proyek
+        now()->format('Y') // Tahun sekarang
+      ))->reverse()->mapWithKeys(function ($year) use ($projects) {
+        $projectsByYear = $projects->filter(function ($project) use ($year) {
+          return $project->created_at->format('Y') == $year;
+        })->unique('id');
 
-    // Data proyek dikelompokkan berdasarkan Tahun, Bulan, dan Hari
-    $projectData = $user->role === 'Admin'
-      ? [
-        'Year' => Project::selectRaw('YEAR(created_at) as year, COUNT(*) as count')
-          ->groupBy('year')
-          ->orderBy('year')
-          ->pluck('count', 'year')
-          ->toArray(),
+        // Total per tahun
+        $totalByYear = $projectsByYear->count();
 
-        'Month' => Project::selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month, COUNT(*) as count")
-          ->groupBy('month')
-          ->orderBy('month')
-          ->pluck('count', 'month')
-          ->toArray(),
+        return [
+          $year => [
+            'total' => $totalByYear, // Tambahkan total proyek per tahun
+            'months' => collect(range(1, 12))->mapWithKeys(function ($month) use ($projectsByYear) {
+              $monthName = date('F', mktime(0, 0, 0, $month, 1));
+              $projectsByMonth = $projectsByYear->filter(function ($project) use ($month) {
+                return $project->created_at->month == $month;
+              })->unique('id');
 
-        'Day' => Project::selectRaw("DATE_FORMAT(created_at, '%Y-%m-%d') as day, COUNT(*) as count")
-          ->groupBy('day')
-          ->orderBy('day')
-          ->pluck('count', 'day')
-          ->toArray(),
-      ]
-      : [];
+              // Total per bulan
+              $totalByMonth = $projectsByMonth->count();
 
-    // Data pengguna untuk chart (hanya untuk Admin)
-    $userData = $user->role === 'Admin'
-      ? User::selectRaw('role, COUNT(*) as Users')
-        ->where('role', '!=', 'Admin')
-        ->groupBy('role')
-        ->get()
-      : [];
+              return [
+                $monthName => [
+                  'total' => $totalByMonth, // Tambahkan total proyek per bulan
+                  'Active' => $projectsByMonth->whereNull('deleted_at')->count(),
+                  'Inactive' => $projectsByMonth->whereNotNull('deleted_at')->count(),
+                ],
+              ];
+            }),
+          ],
+        ];
+      })->sortKeysDesc(),
+    ];
+
+
+    $users = [
+      'total' => User::withTrashed()->where('role', '!=', 'Admin')->count(), // Semua pengguna termasuk yang soft deleted
+      'details' => [
+        'Project Manager' => [
+          'Active' => User::where('role', 'project_manager')
+            ->whereNull('deleted_at') // Hanya yang aktif
+            ->count(),
+          'Inactive' => User::withTrashed()
+            ->where('role', 'project_manager')
+            ->whereNotNull('deleted_at') // Hanya yang soft deleted
+            ->count(),
+        ],
+        'Developer' => [
+          'Active' => User::where('role', 'developer')
+            ->whereNull('deleted_at')
+            ->count(),
+          'Inactive' => User::withTrashed()
+            ->where('role', 'developer')
+            ->whereNotNull('deleted_at')
+            ->count(),
+        ],
+        'Quality Assurance' => [
+          'Active' => User::where('role', 'quality_assurance')
+            ->whereNull('deleted_at')
+            ->count(),
+          'Inactive' => User::withTrashed()
+            ->where('role', 'quality_assurance')
+            ->whereNotNull('deleted_at')
+            ->count(),
+        ],
+      ],
+    ];
+
 
     return Inertia::render('Dashboard', [
       'title' => 'Dashboard',
       'notification' => session()->pull('notification'),
-      'total_users' => $user->role === 'Admin' ? User::where('role', '!=', 'Admin')->count() : 0,
-      'total_projects' => $projects->count(),
-      'total_bugs' => $total_bugs,
-      'projectData' => $projectData,
-      'userData' => $userData,
+      'users' => $users,
+      'projects' => $projectsData,
     ]);
   })->name('dashboard');
 

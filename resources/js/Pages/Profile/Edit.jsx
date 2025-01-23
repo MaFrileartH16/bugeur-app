@@ -1,4 +1,6 @@
 import { PageHeadings } from '@/Components/PageHeadings.jsx';
+import { PasswordInput } from '@/Components/PasswordInput.jsx';
+import { TextInput } from '@/Components/TextInput.jsx';
 import { AppLayout } from '@/Layouts/AppLayout.jsx';
 import { useForm } from '@inertiajs/react';
 import {
@@ -7,9 +9,7 @@ import {
   FileButton,
   Grid,
   Group,
-  PasswordInput,
   Text,
-  TextInput,
   Title,
 } from '@mantine/core';
 import {
@@ -31,14 +31,11 @@ const Edit = (props) => {
     password: '',
   });
 
-  console.log(form.data);
-
   const validateAvatar = (file) => {
     if (file && !['image/png', 'image/jpeg', 'image/jpg'].includes(file.type)) {
       return 'Only PNG, JPEG, and JPG formats are allowed.';
     }
     if (file && file.size > 2 * 1024 * 1024) {
-      // 2 MB limit
       return 'File size must not exceed 2 MB.';
     }
     return null;
@@ -50,14 +47,13 @@ const Edit = (props) => {
       form.setError('avatar', error);
       return;
     }
-
     form.setData('avatar', file);
     form.clearErrors('avatar');
   };
 
   const validateEmail = (value) => {
-    if (!value) return 'Email Address is required.';
-    if (!value.endsWith('@bugeur.id')) return 'Email must use @bugeur.id.';
+    if (!value) return 'Email is required.';
+    if (!value.endsWith('@bugeur.id')) return 'Email must end with @bugeur.id.';
     return null;
   };
 
@@ -70,7 +66,6 @@ const Edit = (props) => {
   const handleChangeEmail = (e) => {
     const value = e.target.value;
     form.setData('email', value);
-
     const error = validateEmail(value);
     error ? form.setError('email', error) : form.clearErrors('email');
   };
@@ -78,7 +73,6 @@ const Edit = (props) => {
   const handleChangePassword = (e) => {
     const value = e.target.value;
     form.setData('password', value);
-
     const error = validatePassword(value);
     error ? form.setError('password', error) : form.clearErrors('password');
   };
@@ -95,21 +89,20 @@ const Edit = (props) => {
   return (
     <form onSubmit={handleSubmit}>
       <AppLayout
-        title={props.title}
+        title="Edit Profile"
         user={user}
         notification={props.notification}
       >
         <PageHeadings
-          title="Profile"
-          description="Access and update your account details, including personal information and preferences."
+          title="Edit Profile"
+          description="Update your profile details and preferences."
         />
 
         <Grid gutter={16} justify="flex-end">
-          {/* Avatar Field */}
           <Grid.Col span={{ base: 12 }}>
             <Grid gutter={8} align="start">
               <Grid.Col span={{ base: 12, sm: 4 }}>
-                <Title order={5}>Avatar</Title>
+                <Title order={5}>Profile Picture</Title>
               </Grid.Col>
               <Grid.Col span={{ base: 12, sm: 8 }}>
                 <Group align="flex-start" spacing="sm">
@@ -119,7 +112,7 @@ const Edit = (props) => {
                         ? URL.createObjectURL(form.data.avatar)
                         : form.data.avatar
                     }
-                    alt={form.data.full_name}
+                    alt="Profile Picture"
                     size={80}
                   />
 
@@ -133,12 +126,11 @@ const Edit = (props) => {
                         {...props}
                         leftSection={<IconPhotoUp />}
                       >
-                        Upload Photo
+                        Upload
                       </Button>
                     )}
                   </FileButton>
                 </Group>
-
                 {form.errors.avatar && (
                   <Text color="red" size="sm">
                     {form.errors.avatar}
@@ -148,7 +140,6 @@ const Edit = (props) => {
             </Grid>
           </Grid.Col>
 
-          {/* Full Name Field */}
           <Grid.Col span={{ base: 12 }}>
             <Grid gutter={8} align="start">
               <Grid.Col span={{ base: 12, sm: 4 }}>
@@ -157,8 +148,8 @@ const Edit = (props) => {
               <Grid.Col span={{ base: 12, sm: 8 }}>
                 <TextInput
                   value={form.data.full_name}
-                  placeholder="e.g., John Doe"
-                  description="This is your full name as it appears on your profile. It cannot be edited."
+                  placeholder="John Doe"
+                  description="Your full name as displayed on your profile."
                   leftSection={<IconUser />}
                   readOnly
                   disabled
@@ -167,7 +158,6 @@ const Edit = (props) => {
             </Grid>
           </Grid.Col>
 
-          {/* Role Field */}
           <Grid.Col span={{ base: 12 }}>
             <Grid gutter={8} align="start">
               <Grid.Col span={{ base: 12, sm: 4 }}>
@@ -176,8 +166,8 @@ const Edit = (props) => {
               <Grid.Col span={{ base: 12, sm: 8 }}>
                 <TextInput
                   value={user.role}
-                  placeholder="e.g., Project Manager"
-                  description="Your assigned role within the system. This field is not editable."
+                  placeholder="Role"
+                  description="Your system role."
                   leftSection={<IconKey />}
                   readOnly
                   disabled
@@ -186,19 +176,18 @@ const Edit = (props) => {
             </Grid>
           </Grid.Col>
 
-          {/* Email Field */}
           <Grid.Col span={{ base: 12 }}>
             <Grid gutter={8} align="start">
               <Grid.Col span={{ base: 12, sm: 4 }}>
-                <Title order={5}>Email Address</Title>
+                <Title order={5}>Email</Title>
               </Grid.Col>
               <Grid.Col span={{ base: 12, sm: 8 }}>
                 <TextInput
                   value={form.data.email}
                   onChange={handleChangeEmail}
                   error={form.errors.email}
-                  placeholder="e.g., johndoe@bugeur.id"
-                  description="Your email address used for login and communication. It cannot be changed."
+                  placeholder="example@bugeur.id"
+                  description="Your email address."
                   leftSection={<IconMail />}
                   readOnly
                   disabled
@@ -207,26 +196,24 @@ const Edit = (props) => {
             </Grid>
           </Grid.Col>
 
-          {/* Password Field */}
           <Grid.Col span={{ base: 12 }}>
             <Grid gutter={8} align="start">
               <Grid.Col span={{ base: 12, sm: 4 }}>
-                <Title order={5}>New Password</Title>
+                <Title order={5}>Password</Title>
               </Grid.Col>
               <Grid.Col span={{ base: 12, sm: 8 }}>
                 <PasswordInput
                   value={form.data.password}
                   onChange={handleChangePassword}
                   error={form.errors.password}
-                  placeholder="Leave this blank to keep your current password"
-                  description="Enter a new password if you wish to update it. Otherwise, leave it blank."
+                  placeholder="Enter new password"
+                  description="Leave blank to keep current password."
                   leftSection={<IconPassword />}
                 />
               </Grid.Col>
             </Grid>
           </Grid.Col>
 
-          {/* Submit Button */}
           <Grid.Col span={{ base: 12, sm: 8, smOffset: 4 }}>
             <Button
               type="submit"

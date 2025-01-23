@@ -17,7 +17,7 @@ export const UserMenu = ({ user }) => {
             style={{
               position: 'absolute',
               right: 0,
-              bottom: -20,
+              bottom: -16,
             }}
           >
             {(() => {

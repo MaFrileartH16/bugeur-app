@@ -98,8 +98,8 @@ const Login = (props) => {
                   value={form.data.email}
                   onChange={handleChangeEmail}
                   error={form.errors.email}
-                  placeholder="e.g., user@bugeur.id"
-                  description="Please enter a valid email address ending with @bugeur.id."
+                  placeholder="Enter your email address" // Placeholder best practice
+                  description="Use a valid email address ending with @bugeur.id."
                   leftSection={<IconMail />}
                   autoFocus
                   autoComplete="email"
@@ -114,8 +114,7 @@ const Login = (props) => {
                   value={form.data.password}
                   onChange={handleChangePassword}
                   error={form.errors.password}
-                  placeholder="Enter your secure password"
-                  description="Your password should be at least 8 characters long and secure."
+                  placeholder="Enter your password"
                   leftSection={<IconPassword />}
                 />
               </Box>
