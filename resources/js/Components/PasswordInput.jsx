@@ -4,7 +4,7 @@ export const PasswordInput = ({ description, error, ...props }) => {
   return (
     <>
       {description && (
-        <Text c="ghost" mb={8}>
+        <Text c="gray" mb={8}>
           {description}
         </Text>
       )}

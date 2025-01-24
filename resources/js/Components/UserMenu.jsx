@@ -38,6 +38,7 @@ export const UserMenu = ({ user }) => {
       <Menu.Dropdown p={0}>
         <Menu.Item
           h={48}
+          color="gray"
           leftSection={<IconId />}
           onClick={() => router.get(route('profile.edit', user))}
         >

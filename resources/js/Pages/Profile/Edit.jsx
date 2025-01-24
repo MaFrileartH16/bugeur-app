@@ -215,10 +215,9 @@ const Edit = (props) => {
             </Grid>
           </Grid.Col>
 
-          <Grid.Col span={{ base: 12, sm: 8, smOffset: 4 }}>
+          <Grid.Col span={{ base: 12, sm: 8 }} align="end">
             <Button
               type="submit"
-              fullWidth
               leftSection={<IconCornerDownLeft />}
               disabled={form.processing || hasErrors}
               loading={form.processing}

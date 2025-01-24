@@ -86,7 +86,6 @@ const Dashboard = (props) => {
               style={{
                 cursor: params.onClick ? 'pointer' : 'default',
                 borderRadius: 16,
-                backgroundColor: '#fff',
               }}
               styles={{
                 icon: {
@@ -117,7 +116,7 @@ const Dashboard = (props) => {
         >
           <Stack>
             {/* Chart 1: Project */}
-            <Paper shadow={0} h="100%" bg="#fff" p={16}>
+            <Paper shadow="xs" h="100%" p={16} withBorder>
               <Group justify="space-between" mb={16}>
                 <Text fw={500} fz={20}>
                   Projects
@@ -191,7 +190,7 @@ const Dashboard = (props) => {
             sm: 4,
           }}
         >
-          <Paper shadow={0} h="100%" bg="#fff" px={16} pt={16}>
+          <Paper shadow="xs" h="100%" withBorder px={16} pt={16}>
             <Text fw={500} fz={20} mb={16}>
               User Role
             </Text>

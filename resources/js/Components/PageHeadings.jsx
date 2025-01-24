@@ -9,7 +9,7 @@ export const PageHeadings = (props) => {
             <Anchor
               key={index}
               size="sm"
-              c={index === props.breadcrumbs.length - 1 ? 'dark' : 'ghost'}
+              c={index === props.breadcrumbs.length - 1 ? 'dark' : 'gray'}
               onClick={item.onClick}
             >
               {item.label}
@@ -21,7 +21,7 @@ export const PageHeadings = (props) => {
       <Title order={2}>{props.title}</Title>
 
       {props.description && (
-        <Text size="sm" c="ghost">
+        <Text size="sm" c="gray">
           {props.description}
         </Text>
       )}

@@ -6,7 +6,12 @@ export const ScrollToTop = () => {
   const [scroll, scrollTo] = useWindowScroll();
 
   return (
-    <Affix position={{ bottom: 16, right: 16 }}>
+    <Affix
+      position={{ bottom: 16, right: 16 }}
+      style={{
+        zIndex: 2,
+      }}
+    >
       <Transition transition="fade" mounted={scroll.y > 0}>
         {(transitionStyles) => (
           <Tooltip label="Scroll to top">

@@ -27,12 +27,19 @@ export const NavigationDrawer = () => {
 
   return (
     <>
-      <Drawer.Root opened={opened} onClose={close} size="xs">
+      <Drawer.Root
+        opened={opened}
+        onClose={close}
+        size="xs"
+        style={{
+          zIndex: 202,
+        }}
+      >
         <Drawer.Overlay />
 
         <Drawer.Content>
           <Drawer.Header p={16}>
-            <ActionIcon onClick={close} variant="subtle" color="ghost">
+            <ActionIcon onClick={close} variant="subtle" color="gray">
               <IconX />
             </ActionIcon>
           </Drawer.Header>
@@ -68,7 +75,7 @@ export const NavigationDrawer = () => {
         </Drawer.Content>
       </Drawer.Root>
 
-      <ActionIcon onClick={open} variant="subtle" color="ghost">
+      <ActionIcon onClick={open} variant="subtle" color="gray">
         <IconMenu4 />
       </ActionIcon>
     </>

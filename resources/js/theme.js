@@ -1,4 +1,3 @@
-import { generateColors } from '@mantine/colors-generator';
 import {
   ActionIcon,
   Avatar,
@@ -13,17 +12,9 @@ import {
 } from '@mantine/core';
 
 export const theme = createTheme({
-  colors: {
-    navy: generateColors('#000080'),
-    crystal: generateColors('#A8DADC'),
-    macaroni: generateColors('#FFB385'),
-    ghost: generateColors('#F8F9FA'),
-    magic: generateColors('#B5EAD7'),
-    peach: generateColors('#FFD1BA'),
-    soap: generateColors('#D4D8F0'),
-  },
+  colors: {},
   fontFamily: 'Fredoka, serif',
-  primaryColor: 'navy',
+  primaryColor: 'blue',
   headings: {
     sizes: {
       h1: { fontSize: '44px', fontWeight: '700', lineHeight: '56px' },
@@ -34,8 +25,8 @@ export const theme = createTheme({
       h6: { fontSize: '14px', fontWeight: '400', lineHeight: '20px' },
     },
   },
-  white: '#f2f2f2',
-  black: '#0d0d0d',
+  // white: '#f2f2f2',
+  // black: '#0d0d0d',
   // primaryShade: { light: 5, dark: 7 },
   autoContrast: true,
   radius: {
@@ -137,6 +128,7 @@ export const theme = createTheme({
       },
     }),
     Pagination: Pagination.extend({
+      defaultProps: {},
       styles: {
         control: {
           height: 48,
@@ -148,7 +140,7 @@ export const theme = createTheme({
     Avatar: Avatar.extend({
       defaultProps: {
         radius: 16,
-        color: 'navy',
+        color: 'blue',
       },
     }),
     MultiSelect: MultiSelect.extend({

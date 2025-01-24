@@ -1,1 +1,0 @@
-import{j as t,p as m}from"./app-7YMc50Dg.js";import{a as n}from"./AppLayout-CEt-gjRC.js";const a=({description:s,error:e,...x})=>t.jsxs(t.Fragment,{children:[s&&t.jsx(n,{c:"ghost",mb:8,children:s}),t.jsx(m,{mt:s?0:8,...x,styles:{input:{borderColor:e?"red":void 0}}}),e&&t.jsx(n,{c:"red",mt:8,children:e})]});export{a as T};
