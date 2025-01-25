@@ -1,4 +1,5 @@
 import { PageHeadings, Select, TextInput } from '@/Components';
+import { Pagination } from '@/Components/Pagination.jsx';
 import { AppLayout } from '@/Layouts';
 import { getInitialName } from '@/utils';
 import { router } from '@inertiajs/react';
@@ -17,7 +18,6 @@ import {
   Indicator,
   Menu,
   Modal,
-  Pagination,
   Stack,
   Text,
   Title,
