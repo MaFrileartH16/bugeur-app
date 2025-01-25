@@ -8,7 +8,6 @@ import {
 } from '@tabler/icons-react';
 
 export const Pagination = (props) => {
-  console.log(props);
   const IconChevronsLeft = () => <IconChevronsLeftTabler size={24} />;
   const IconChevronLeft = () => <IconChevronLeftTabler size={24} />;
   const IconChevronRight = () => <IconChevronRightTabler size={24} />;

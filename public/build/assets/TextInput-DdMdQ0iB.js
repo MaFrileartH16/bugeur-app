@@ -1,1 +1,0 @@
-import{j as t,p as x}from"./app-CEaRo_v6.js";import{a as n}from"./AppLayout-z9avZPDp.js";const d=({description:e,error:s,...r})=>t.jsxs(t.Fragment,{children:[e&&t.jsx(n,{c:"gray",mb:8,children:e}),t.jsx(x,{mt:e?0:8,...r,styles:{input:{borderColor:s?"red":void 0}}}),s&&t.jsx(n,{c:"red",mt:8,children:s})]});export{d as T};
