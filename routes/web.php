@@ -6,7 +6,6 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\UserController;
 use App\Models\Project;
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -123,10 +122,6 @@ Route::middleware('auth')->group(function () {
         'projects' => $projectsData,
       ]);
     } catch (Exception $e) {
-      // Log error untuk debugging
-      Log::error('Error fetching dashboard data: ' . $e->getMessage());
-
-      // Return respons default
       return Inertia::render('Dashboard', [
         'title' => 'Dashboard',
         'notification' => session()->pull('notification'),
@@ -145,6 +140,7 @@ Route::middleware('auth')->group(function () {
 
 
   Route::resource('users', UserController::class);
+  Route::patch('users/{user}/restore', [UserController::class, 'restore'])->name('users.restore');
   Route::resource('projects', ProjectController::class);
   Route::resource('projects.bugs', BugController::class);
 

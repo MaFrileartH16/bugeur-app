@@ -131,11 +131,18 @@ const Index = (props) => {
     router.get(route('users.edit', userId));
   };
 
+  // Handler untuk restore user
+  const handleRestoreUser = (user) => {
+    console.log(user);
+    if (confirm('Are you sure you want to restore this user?')) {
+      router.patch(route('users.restore', user.id));
+    }
+  };
+
   // Handler untuk delete user
-  const handleDeleteUser = (userId) => {
-    console.log('Delete user:', userId);
+  const handleDeleteUser = (user) => {
     if (confirm('Are you sure you want to delete this user?')) {
-      router.delete(route('users.destroy', userId));
+      router.delete(route('users.destroy', user));
     }
   };
 
@@ -543,6 +550,7 @@ const Index = (props) => {
                       </Menu.Target>
 
                       <Menu.Dropdown p={0}>
+                        {/* Tombol Edit */}
                         <Menu.Item
                           h={48}
                           color="yellow"
@@ -551,16 +559,29 @@ const Index = (props) => {
                         >
                           Edit
                         </Menu.Item>
-                        <Menu.Item
-                          h={48}
-                          color={user.deleted_at ? 'green' : 'red'}
-                          leftSection={
-                            user.deleted_at ? <IconCheck /> : <IconX />
-                          }
-                          onClick={() => handleDeleteUser(user.id)}
-                        >
-                          {user.deleted_at ? 'Active' : 'Deactivate'}
-                        </Menu.Item>
+
+                        {/* Tombol Restore atau Delete */}
+                        {user.deleted_at ? (
+                          // Jika deleted_at ada, tampilkan tombol Restore
+                          <Menu.Item
+                            h={48}
+                            color="green"
+                            leftSection={<IconCheck />}
+                            onClick={() => handleRestoreUser(user)}
+                          >
+                            Restore
+                          </Menu.Item>
+                        ) : (
+                          // Jika deleted_at null, tampilkan tombol Delete
+                          <Menu.Item
+                            h={48}
+                            color="red"
+                            leftSection={<IconX />}
+                            onClick={() => handleDeleteUser(user)}
+                          >
+                            Delete
+                          </Menu.Item>
+                        )}
                       </Menu.Dropdown>
                     </Menu>
                   </Card>
