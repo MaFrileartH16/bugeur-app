@@ -2,12 +2,22 @@ import { PasswordInput, TextInput } from '@/Components/index.jsx';
 import { PageHeadings } from '@/Components/PageHeadings.jsx';
 import { AppLayout } from '@/Layouts/AppLayout.jsx';
 import { router, useForm } from '@inertiajs/react';
-import { Button, Grid, Select, Title } from '@mantine/core';
+import {
+  Avatar,
+  Button,
+  FileButton,
+  Grid,
+  Group,
+  Select,
+  Text,
+  Title,
+} from '@mantine/core';
 import {
   IconCornerDownLeft,
   IconKey,
   IconMail,
   IconPassword,
+  IconUpload,
   IconUser,
 } from '@tabler/icons-react';
 
@@ -15,11 +25,14 @@ const Create = ({ auth }) => {
   const { user } = auth;
 
   const form = useForm({
+    profile_photo: '',
     full_name: '',
     email: '',
     role: '',
     password: '', // Auto-generated, but still kept for form state.
   });
+
+  console.log(form.data);
 
   const validateField = (field, value) => {
     if (!value) {
@@ -74,6 +87,26 @@ const Create = ({ auth }) => {
     });
   };
 
+  const validateProfilePhoto = (file) => {
+    if (file && !['image/png', 'image/jpeg', 'image/jpg'].includes(file.type)) {
+      return 'Only PNG, JPEG, and JPG formats are allowed.';
+    }
+    if (file && file.size > 2 * 1024 * 1024) {
+      return 'File size must not exceed 2 MB.';
+    }
+    return null;
+  };
+
+  const handleProfilePhotoChange = (file) => {
+    const error = validateProfilePhoto(file);
+    if (error) {
+      form.setError('profile_photo', error);
+      return;
+    }
+    form.setData('profile_photo', file);
+    form.clearErrors('profile_photo');
+  };
+
   const hasErrors = Object.keys(form.errors).length > 0;
   const isFormEmpty =
     !form.data.full_name || !form.data.email || !form.data.role;
@@ -98,6 +131,49 @@ const Create = ({ auth }) => {
 
         <Grid gutter={32} justify="flex-end">
           {/* Full Name Input */}
+          <Grid.Col span={{ base: 12 }}>
+            <Grid gutter={8} align="start">
+              {/* Hapus gutter di sini */}
+              <Grid.Col span={{ base: 12, sm: 4 }}>
+                <Title order={5}>Profile Photo</Title>
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 8 }}>
+                <Group align="flex-start" spacing="sm">
+                  <Avatar
+                    src={
+                      form.data.profile_photo instanceof File
+                        ? URL.createObjectURL(form.data.profile_photo)
+                        : form.data.profile_photo
+                    }
+                    alt="Profile Photo"
+                    size={80}
+                  />
+
+                  <FileButton
+                    onChange={handleProfilePhotoChange}
+                    accept="image/png,image/jpeg,image/jpg"
+                  >
+                    {(props) => (
+                      <Button
+                        variant="subtle"
+                        {...props}
+                        leftSection={<IconUpload />}
+                      >
+                        {form.data.profile_photo ? 'Change' : 'Upload'} Profile
+                        Photo
+                      </Button>
+                    )}
+                  </FileButton>
+                </Group>
+                {form.errors.profile_photo && (
+                  <Text color="red" size="sm">
+                    {form.errors.profile_photo}
+                  </Text>
+                )}
+              </Grid.Col>
+            </Grid>
+          </Grid.Col>
+
           <Grid.Col span={{ base: 12 }}>
             <Grid gutter={{ base: 8, sm: 0 }} align="start">
               <Grid.Col span={{ base: 12, sm: 4 }}>
@@ -150,10 +226,10 @@ const Create = ({ auth }) => {
                   leftSection={<IconKey />}
                   description="Choose the role that best fits the user's responsibilities."
                   data={[
-                    { value: 'project_manager', label: 'Project Manager' },
-                    { value: 'developer', label: 'Developer' },
+                    { value: 'Project Manager', label: 'Project Manager' },
+                    { value: 'Developer', label: 'Developer' },
                     {
-                      value: 'quality_assurance',
+                      value: 'Quality Assurance',
                       label: 'Quality Assurance',
                     },
                   ]}

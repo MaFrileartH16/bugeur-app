@@ -18,7 +18,7 @@ export const PageHeadings = (props) => {
         </Breadcrumbs>
       )}
 
-      <Title order={2}>{props.title}</Title>
+      {props.title && <Title order={1}>{props.title}</Title>}
 
       {props.description && (
         <Text size="sm" c="gray">

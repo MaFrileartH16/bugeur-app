@@ -1,17 +1,13 @@
+import {
+  MultiSelect,
+  Select,
+  Textarea,
+  TextInput,
+} from '@/Components/index.jsx';
 import { PageHeadings } from '@/Components/PageHeadings.jsx';
 import { AppLayout } from '@/Layouts/AppLayout.jsx';
 import { router, useForm } from '@inertiajs/react';
-import {
-  Button,
-  Container,
-  Grid,
-  MultiSelect,
-  Select,
-  Text,
-  Textarea,
-  TextInput,
-  Title,
-} from '@mantine/core';
+import { Button, Grid, Title } from '@mantine/core';
 import {
   IconAlignJustified,
   IconCornerDownLeft,
@@ -21,6 +17,7 @@ import {
 } from '@tabler/icons-react';
 
 const Edit = (props) => {
+  console.log(props);
   const { user } = props.auth;
   const { project, managers, users } = props;
 
@@ -96,64 +93,35 @@ const Edit = (props) => {
       return;
     }
 
-    form.put(route('projects.update', project.id), {
-      onFinish: () => form.reset(),
-    });
+    form.put(
+      route('projects.update', {
+        project,
+      }),
+      {
+        onFinish: () => form.reset(),
+      },
+    );
   };
 
-  const fields = [
-    {
-      label: 'Title',
-      value: form.data.title,
-      onChange: handleTitleChange,
-      error: form.errors.title,
-      placeholder: "Enter the project's title, e.g., Website Redesign",
-      description: 'Provide a concise and descriptive title for the project.',
-      leftSection: <IconFolder />,
-      component: TextInput,
-    },
-    {
-      label: 'Description',
-      value: form.data.description,
-      onChange: handleDescriptionChange,
-      error: form.errors.description,
-      placeholder: "Describe the project's objectives and scope",
-      description:
-        'Include key details and objectives to help the team understand the project.',
-      component: Textarea,
-      leftSection: <IconAlignJustified />,
-      minRows: 4,
-    },
-    {
-      label: 'Manager',
-      value: form.data.manager_id,
-      onChange: handleManagerChange,
-      error: form.errors.manager_id,
-      placeholder: 'Select a project manager',
-      description: 'Assign a manager who will oversee the project.',
-      leftSection: <IconUser />,
-      component: Select,
-      data: managers.map((manager) => ({
-        value: manager.id,
-        label: manager.full_name,
-      })),
-    },
-    {
-      label: 'Team Members',
-      value: form.data.team_members,
-      onChange: handleTeamMembersChange,
-      error: form.errors.team_members,
-      placeholder: 'Select team members',
-      description:
-        'Include at least one Developer and one Quality Assurance member.',
-      leftSection: <IconUsers />,
-      component: MultiSelect,
-      data: users.map((user) => ({
-        value: user.id,
-        label: `${user.full_name} (${user.role})`,
-      })),
-    },
-  ];
+  const validateCoverPhoto = (file) => {
+    if (file && !['image/png', 'image/jpeg', 'image/jpg'].includes(file.type)) {
+      return 'Only PNG, JPEG, and JPG formats are allowed.';
+    }
+    if (file && file.size > 2 * 1024 * 1024) {
+      return 'File size must not exceed 2 MB.';
+    }
+    return null;
+  };
+
+  const handleCoverPhotoChange = (file) => {
+    const error = validateCoverPhoto(file);
+    if (error) {
+      form.setError('cover_photo', error);
+      return;
+    }
+    form.setData('cover_photo', file);
+    form.clearErrors('cover_photo');
+  };
 
   const hasErrors = Object.keys(form.errors).length > 0;
   const isFormEmpty =
@@ -165,59 +133,121 @@ const Edit = (props) => {
   return (
     <form onSubmit={handleSubmit}>
       <AppLayout title="Edit Project" user={user}>
-        <Container flex={1} size="xl" w="100%" py={32}>
-          <PageHeadings
-            title="Edit Project"
-            description="Modify the details of the project to ensure it reflects the latest requirements."
-            breadcrumbs={[
-              {
-                label: 'Projects',
-                onClick: () => router.get(route('projects.index')),
-              },
-              {
-                label: 'Edit',
-                onClick: () => router.get(route('projects.edit', project.id)),
-              },
-            ]}
-          />
+        <PageHeadings
+          title="Edit Project"
+          description="Modify the details of the project to ensure it reflects the latest requirements."
+          breadcrumbs={[
+            {
+              label: 'Projects',
+              onClick: () => router.get(route('projects.index')),
+            },
+            {
+              label: 'Edit',
+              onClick: () => router.get(route('projects.edit', project.id)),
+            },
+          ]}
+        />
 
-          <Grid gutter={32} justify="flex-end">
-            {fields.map(
-              (
-                { component: Component, label, description, ...restField },
-                index,
-              ) => (
-                <Grid.Col key={index} span={{ base: 12 }}>
-                  <Grid gutter={{ base: 8, sm: 0 }} align="start">
-                    <Grid.Col span={{ base: 12, sm: 4 }}>
-                      <Title order={5}>{label}</Title>
-                    </Grid.Col>
-                    <Grid.Col span={{ base: 12, sm: 8 }}>
-                      <Component {...restField} />
-                      {description && (
-                        <Text size="xs" color="dimmed" mt={8}>
-                          {description}
-                        </Text>
-                      )}
-                    </Grid.Col>
-                  </Grid>
-                </Grid.Col>
-              ),
-            )}
+        <Grid gutter={32} justify="flex-end">
+          {/* Title Field */}
+          <Grid.Col span={{ base: 12 }}>
+            <Grid gutter={{ base: 8, sm: 0 }} align="start">
+              <Grid.Col span={{ base: 12, sm: 4 }}>
+                <Title order={5}>Title</Title>
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 8 }}>
+                <TextInput
+                  value={form.data.title}
+                  onChange={handleTitleChange}
+                  error={form.errors.title}
+                  placeholder="Enter the project's title, e.g., Website Redesign"
+                  leftSection={<IconFolder />}
+                  description="Provide a concise and descriptive title for the project."
+                />
+              </Grid.Col>
+            </Grid>
+          </Grid.Col>
 
-            <Grid.Col span={{ base: 12, sm: 8, smOffset: 4 }}>
-              <Button
-                type="submit"
-                fullWidth
-                leftSection={<IconCornerDownLeft />}
-                disabled={form.processing || hasErrors || isFormEmpty}
-                loading={form.processing}
-              >
-                Save Changes
-              </Button>
-            </Grid.Col>
-          </Grid>
-        </Container>
+          {/* Description Field */}
+          <Grid.Col span={{ base: 12 }}>
+            <Grid gutter={{ base: 8, sm: 0 }} align="start">
+              <Grid.Col span={{ base: 12, sm: 4 }}>
+                <Title order={5}>Description</Title>
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 8 }}>
+                <Textarea
+                  value={form.data.description}
+                  onChange={handleDescriptionChange}
+                  error={form.errors.description}
+                  placeholder="Describe the project's objectives and scope"
+                  leftSection={<IconAlignJustified />}
+                  minRows={4}
+                  description="Include key details and objectives to help the team understand
+                  the project."
+                />
+              </Grid.Col>
+            </Grid>
+          </Grid.Col>
+
+          {/* Manager Field */}
+          <Grid.Col span={{ base: 12 }}>
+            <Grid gutter={{ base: 8, sm: 0 }} align="start">
+              <Grid.Col span={{ base: 12, sm: 4 }}>
+                <Title order={5}>Manager</Title>
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 8 }}>
+                <Select
+                  value={form.data.manager_id}
+                  onChange={handleManagerChange}
+                  error={form.errors.manager_id}
+                  placeholder="Select a project manager"
+                  leftSection={<IconUser />}
+                  data={managers.map((manager) => ({
+                    value: manager.id,
+                    label: manager.full_name,
+                  }))}
+                  description="Assign a manager who will oversee the project."
+                />
+              </Grid.Col>
+            </Grid>
+          </Grid.Col>
+
+          {/* Team Members Field */}
+          <Grid.Col span={{ base: 12 }}>
+            <Grid gutter={{ base: 8, sm: 0 }} align="start">
+              <Grid.Col span={{ base: 12, sm: 4 }}>
+                <Title order={5}>Team Members</Title>
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 8 }}>
+                <MultiSelect
+                  value={form.data.team_members}
+                  onChange={handleTeamMembersChange}
+                  error={form.errors.team_members}
+                  placeholder="Select team members"
+                  leftSection={<IconUsers />}
+                  data={users.map((member) => ({
+                    value: member.id,
+                    label: `${member.full_name} (${member.role})`,
+                  }))}
+                  description="Include at least one Developer and one Quality Assurance
+                  member."
+                />
+              </Grid.Col>
+            </Grid>
+          </Grid.Col>
+
+          {/* Submit Button */}
+          <Grid.Col span={{ base: 12, sm: 8 }} align="end">
+            <Button
+              type="submit"
+              leftSection={<IconCornerDownLeft />}
+              disabled={form.processing || hasErrors || isFormEmpty}
+              loading={form.processing}
+            >
+              Save Changes
+            </Button>
+          </Grid.Col>
+        </Grid>
       </AppLayout>
     </form>
   );

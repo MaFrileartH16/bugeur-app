@@ -22,44 +22,31 @@ class ProfileController extends Controller
     ]);
   }
 
-  /**
-   * Update the user's profile information.
-   */
   public function update(Request $request): RedirectResponse
   {
-    // Validasi input
-    $validated = $request->validate([
-      'profile_photo_path' => ['nullable', 'image', 'max:1024'], // Maksimal 1MB
-      'full_name' => ['required', 'string', 'max:255'],
-      'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $request->user()->id],
-      'password' => ['nullable', 'string', 'min:8'],
-    ]);
-
     $user = $request->user();
 
     // Tangani avatar (unggah file)
-    if ($request->hasFile('profile_photo_path')) {
+    if ($request->hasFile('profile_photo')) {
       // Hapus avatar lama jika ada
       if ($user->profile_photo_path) {
         Storage::disk('public')->delete($user->profile_photo_path);
       }
 
       // Simpan avatar baru
-      $path = $request->file('profile_photo_path')->store('avatars', 'public');
-      $validated['profile_photo_path'] = $path;
-    } else {
-      unset($validated['profile_photo_path']);
+      $path = $request->file('profile_photo')->store('profile-photos', 'public');
+      $user->profile_photo_path = $path;
     }
 
     // Perbarui data pengguna
     $user->fill([
-      'profile_photo_path' => $validated['profile_photo_path'] ?? $user->profile_photo_path, // Tetap gunakan avatar lama jika tidak ada unggahan baru
-      'full_name' => $validated['full_name'],
-      'email' => $validated['email'],
+      'full_name' => $request->full_name,
+      'email' => $request->email,
     ]);
 
-    if (!empty($validated['password'])) {
-      $user->password = bcrypt($validated['password']);
+    // Update password jika diisi
+    if (!empty($request->password)) {
+      $user->password = bcrypt($request->password);
     }
 
     // Reset email verifikasi jika email diubah

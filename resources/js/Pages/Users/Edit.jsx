@@ -1,15 +1,8 @@
+import { PasswordInput, Select, TextInput } from '@/Components/index.jsx';
 import { PageHeadings } from '@/Components/PageHeadings.jsx';
 import { AppLayout } from '@/Layouts/AppLayout.jsx';
 import { router, useForm } from '@inertiajs/react';
-import {
-  Button,
-  Grid,
-  PasswordInput,
-  Select,
-  Text,
-  TextInput,
-  Title,
-} from '@mantine/core';
+import { Button, Grid, Title } from '@mantine/core';
 import {
   IconCornerDownLeft,
   IconKey,
@@ -21,11 +14,12 @@ import {
 const Edit = (props) => {
   const { user: authUser } = props.auth;
   const user = props.user;
+  console.log(user);
 
   const form = useForm({
     full_name: user.full_name || '',
     email: user.email || '',
-    role: user.role.toLowerCase().replace(/\s+/g, '_') || '',
+    role: user.role || '',
     password: '', // Password dapat diisi manual
   });
 
@@ -116,10 +110,8 @@ const Edit = (props) => {
                   error={form.errors.full_name}
                   placeholder="Enter full name"
                   leftSection={<IconUser />}
+                  description="The user's full name as it will appear in the system."
                 />
-                <Text size="xs" color="dimmed" mt={8}>
-                  The user's full name as it will appear in the system.
-                </Text>
               </Grid.Col>
             </Grid>
           </Grid.Col>
@@ -137,10 +129,8 @@ const Edit = (props) => {
                   error={form.errors.email}
                   placeholder="Enter email address"
                   leftSection={<IconMail />}
+                  description="Use a valid email address ending with @bugeur.id."
                 />
-                <Text size="xs" color="dimmed" mt={8}>
-                  Use a valid email address ending with @bugeur.id.
-                </Text>
               </Grid.Col>
             </Grid>
           </Grid.Col>
@@ -158,18 +148,16 @@ const Edit = (props) => {
                   error={form.errors.role}
                   placeholder="Select a role"
                   leftSection={<IconKey />}
+                  description="Choose the role that best fits the user's responsibilities."
                   data={[
-                    { value: 'project_manager', label: 'Project Manager' },
-                    { value: 'developer', label: 'Developer' },
+                    { value: 'Project Manager', label: 'Project Manager' },
+                    { value: 'Developer', label: 'Developer' },
                     {
-                      value: 'quality_assurance',
+                      value: 'Quality Assurance',
                       label: 'Quality Assurance',
                     },
                   ]}
                 />
-                <Text size="xs" color="dimmed" mt={8}>
-                  Choose the role that best fits the user's responsibilities.
-                </Text>
               </Grid.Col>
             </Grid>
           </Grid.Col>
@@ -187,10 +175,8 @@ const Edit = (props) => {
                   error={form.errors.password}
                   placeholder="Enter new password"
                   leftSection={<IconPassword />}
+                  description="Set a new password for the user."
                 />
-                <Text size="xs" color="dimmed" mt={8}>
-                  Set a new password for the user.
-                </Text>
               </Grid.Col>
             </Grid>
           </Grid.Col>

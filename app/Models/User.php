@@ -29,8 +29,11 @@ class User extends Authenticatable
     'full_name',
     'email',
     'role',
-    'password', 'deleted_at',
+    'password',
+    'deleted_at',
   ];
+
+  protected $dates = ['deleted_at'];
 
   /**
    * The attributes that should be hidden for serialization.
@@ -93,15 +96,16 @@ class User extends Authenticatable
 
   public function getRoleAttribute(): string
   {
-    // Replace underscores with spaces and capitalize each word
-    return collect(explode('_', $this->attributes['role']))
-      ->map(fn($word) => ucfirst($word)) // Capitalize each word
-      ->implode(' ');
+    return ucfirst($this->attributes['role']);
   }
 
-  public function getProfilePhotoPathAttribute(): string
+  public function getProfilePhotoPathAttribute(): ?string
   {
-    return asset('storage/' . $this->attributes['profile_photo_path']);
+    if (!empty($this->attributes['profile_photo_path'])) {
+      return asset('storage/' . $this->attributes['profile_photo_path']);
+    }
+
+    return null;
   }
 
   /**

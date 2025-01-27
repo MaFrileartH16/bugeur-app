@@ -39,7 +39,7 @@ const Dashboard = (props) => {
     },
     {
       label: 'Total Bugs',
-      value: 0, // Default bugs (karena belum ada data bugs)
+      value: props.bugs.total || 0, // Default total bugs ke 0 jika undefined
       icon: <IconBug size={24} />,
       onClick:
         authUser.role !== 'Admin'
@@ -68,7 +68,7 @@ const Dashboard = (props) => {
         description="Overview of your projects and team activities."
       />
 
-      <Grid gutter={16} grow>
+      <Grid gutter={16} grow mb={32}>
         {data.map(({ label, value, ...params }, index) => (
           <Grid.Col
             key={index}
@@ -106,97 +106,15 @@ const Dashboard = (props) => {
         ))}
       </Grid>
 
-      <Grid mt={32}>
-        {/* Bagian kiri dengan dua chart */}
-        <Grid.Col
-          span={{
-            base: 12,
-            sm: 8,
-          }}
-        >
-          <Stack>
-            {/* Chart 1: Project */}
-            <Paper shadow="xs" h="100%" p={16} withBorder>
-              <Group justify="space-between" mb={16}>
-                <Text fw={500} fz={20}>
-                  Projects
-                </Text>
-                <Select
-                  w={{
-                    base: '100%',
-                    xs: 'auto',
-                  }}
-                  leftSection={<IconCalendarTime />}
-                  onChange={(value) => {
-                    if (value === null) {
-                      setSelectedYear(new Date().getFullYear().toString()); // Set ke tahun sekarang jika null
-                    } else {
-                      setSelectedYear(value); // Set ke tahun yang dipilih
-                    }
-                  }}
-                  placeholder="Select a year"
-                  defaultValue={selectedYear}
-                  data={Object.entries(projects.details)
-                    .sort(([yearA], [yearB]) => yearB - yearA) // Sorting descending berdasarkan tahun
-                    .map(([year, data]) => ({
-                      value: year, // Gunakan tahun sebagai value
-                      label: `${year} (${data.total || 0} projects)`, // Default total ke 0 jika undefined
-                    }))}
-                />
-              </Group>
-              <LineChart
-                h={320}
-                data={Object.entries(projects.details)
-                  .filter(([year]) => year === selectedYear.toString()) // Filter hanya tahun yang dipilih
-                  .flatMap(([, data]) =>
-                    Object.entries(data.months || {}).map(
-                      ([month, { Total = 0, Active = 0, Inactive = 0 }]) => ({
-                        month: `${month} (${Total})`, // Format nama bulan dengan total
-                        Active,
-                        Inactive,
-                      }),
-                    ),
-                  )}
-                dataKey="month"
-                series={[
-                  {
-                    name: 'Active',
-                    color: 'green',
-                  },
-                  {
-                    name: 'Inactive',
-                    color: 'red',
-                  },
-                ]}
-                curveType="natural"
-                tickLine="xy"
-                gridAxis="xy"
-                withLegend
-                withPointLabels
-                xAxisLabel="Month (Total projects)"
-                yAxisLabel="Total"
-                valueFormatter={(value) =>
-                  new Intl.NumberFormat('id-ID').format(value)
-                }
-                tooltipAnimationDuration={160}
-              />
-            </Paper>
-          </Stack>
-        </Grid.Col>
-
-        <Grid.Col
-          span={{
-            base: 12,
-            sm: 4,
-          }}
-        >
-          <Paper shadow="xs" h="100%" withBorder px={16} pt={16}>
+      <Stack>
+        {props.auth.user.role === 'Admin' && (
+          <Paper shadow="xs" withBorder px={16} pt={16}>
             <Text fw={500} fz={20} mb={16}>
               User Role
             </Text>
 
             <BarChart
-              h={500}
+              h={320}
               data={Object.entries(users.details).map(
                 ([role, { Total = 0, Active = 0, Inactive = 0 }]) => ({
                   role: `${role} (${Total})`,
@@ -229,8 +147,141 @@ const Dashboard = (props) => {
               }
             />
           </Paper>
-        </Grid.Col>
-      </Grid>
+        )}
+
+        <Stack>
+          {/* Chart 1: Project */}
+          <Paper shadow="xs" h="100%" p={16} withBorder>
+            <Group justify="space-between" mb={16}>
+              <Text fw={500} fz={20}>
+                Projects
+              </Text>
+              <Select
+                w={{
+                  base: '100%',
+                  xs: 'auto',
+                }}
+                leftSection={<IconCalendarTime />}
+                onChange={(value) => {
+                  if (value === null) {
+                    setSelectedYear(new Date().getFullYear().toString()); // Set ke tahun sekarang jika null
+                  } else {
+                    setSelectedYear(value); // Set ke tahun yang dipilih
+                  }
+                }}
+                placeholder="Select a year"
+                defaultValue={selectedYear}
+                data={Object.entries(projects.details)
+                  .sort(([yearA], [yearB]) => yearB - yearA) // Sorting descending berdasarkan tahun
+                  .map(([year, data]) => ({
+                    value: year, // Gunakan tahun sebagai value
+                    label: `${year} (${data.total || 0} projects)`, // Default total ke 0 jika undefined
+                  }))}
+              />
+            </Group>
+            <LineChart
+              h={320}
+              data={Object.entries(projects.details)
+                .filter(([year]) => year === selectedYear.toString()) // Filter hanya tahun yang dipilih
+                .flatMap(([, data]) =>
+                  Object.entries(data.months || {}).map(
+                    ([month, { Total = 0, Active = 0, Inactive = 0 }]) => ({
+                      month: `${month} (${Total})`, // Format nama bulan dengan total
+                      Active,
+                      Inactive,
+                    }),
+                  ),
+                )}
+              dataKey="month"
+              series={[
+                {
+                  name: 'Active',
+                  color: 'green',
+                },
+                {
+                  name: 'Inactive',
+                  color: 'red',
+                },
+              ]}
+              curveType="natural"
+              tickLine="xy"
+              gridAxis="xy"
+              withLegend
+              withPointLabels
+              xAxisLabel="Month (Total projects)"
+              yAxisLabel="Total"
+              valueFormatter={(value) =>
+                new Intl.NumberFormat('id-ID').format(value)
+              }
+              tooltipAnimationDuration={160}
+            />
+          </Paper>
+        </Stack>
+
+        <Stack>
+          {/* Chart 2: Bugs */}
+          <Paper shadow="xs" h="100%" p={16} withBorder>
+            <Group justify="space-between" mb={16}>
+              <Text fw={500} fz={20}>
+                Bugs
+              </Text>
+              <Select
+                w={{
+                  base: '100%',
+                  xs: 'auto',
+                }}
+                leftSection={<IconCalendarTime />}
+                onChange={(value) => {
+                  if (value === null) {
+                    setSelectedYear(new Date().getFullYear().toString()); // Set ke tahun sekarang jika null
+                  } else {
+                    setSelectedYear(value); // Set ke tahun yang dipilih
+                  }
+                }}
+                placeholder="Select a year"
+                defaultValue={selectedYear}
+                data={Object.entries(props.bugs.details || {})
+                  .sort(([yearA], [yearB]) => yearB - yearA) // Sorting descending berdasarkan tahun
+                  .map(([year, data]) => ({
+                    value: year, // Gunakan tahun sebagai value
+                    label: `${year} (${data.total || 0} bugs)`, // Default total ke 0 jika undefined
+                  }))}
+              />
+            </Group>
+            <LineChart
+              h={320}
+              data={Object.entries(props.bugs.details || {})
+                .filter(([year]) => year === selectedYear.toString()) // Filter hanya tahun yang dipilih
+                .flatMap(([, data]) =>
+                  Object.entries(data.months || {}).map(
+                    ([month, { Total = 0 }]) => ({
+                      month: `${month} (${Total})`, // Format nama bulan dengan total
+                      Total,
+                    }),
+                  ),
+                )}
+              dataKey="month"
+              series={[
+                {
+                  name: 'Total',
+                  color: 'orange',
+                },
+              ]}
+              curveType="natural"
+              tickLine="xy"
+              gridAxis="xy"
+              withLegend
+              withPointLabels
+              xAxisLabel="Month (Total bugs)"
+              yAxisLabel="Total"
+              valueFormatter={(value) =>
+                new Intl.NumberFormat('id-ID').format(value)
+              }
+              tooltipAnimationDuration={160}
+            />
+          </Paper>
+        </Stack>
+      </Stack>
     </AppLayout>
   );
 };

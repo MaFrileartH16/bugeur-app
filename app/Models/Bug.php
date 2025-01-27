@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\BugFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Bug extends Model
 {
   /** @use HasFactory<BugFactory> */
-  use HasFactory, softDeletes;
+  use HasFactory, softDeletes, HasUlids;
 
   /**
    * The attributes that are mass assignable.
@@ -52,4 +53,8 @@ class Bug extends Model
     return $this->belongsTo(User::class, 'assignee_id');
   }
 
+  public function project()
+  {
+    return $this->belongsTo(Project::class, 'project_id');
+  }
 }

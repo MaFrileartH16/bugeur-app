@@ -16,7 +16,7 @@ class Project extends Model
   /** @use HasFactory<ProjectFactory> */
   use HasFactory, SoftDeletes, HasUlids;
 
-  protected $fillable = ['manager_id', 'title', 'description'];
+  protected $fillable = ['cover_photo_path', 'manager_id', 'title', 'description'];
 
   public function manager(): BelongsTo
   {
@@ -32,5 +32,26 @@ class Project extends Model
   public function bugs(): HasMany
   {
     return $this->hasMany(Bug::class, 'project_id', 'id');
+  }
+
+  public function getCoverPhotoPathAttribute(): ?string
+  {
+    if (!empty($this->attributes['cover_photo_path'])) {
+      return asset('storage/' . $this->attributes['cover_photo_path']);
+    }
+
+    return null;
+  }
+
+  public function setCoverPhotoPathAttribute($value): void
+  {
+    // Jika nilai adalah URL yang mengandung 'http://127.0.0.1:8000/storage/'
+    if (is_string($value) && strpos($value, 'http://127.0.0.1:8000/storage/') === 0) {
+      // Hapus bagian 'http://127.0.0.1:8000/storage/' dari URL
+      $this->attributes['cover_photo_path'] = str_replace('http://127.0.0.1:8000/storage/', '', $value);
+    } else {
+      // Jika bukan URL, simpan nilai aslinya
+      $this->attributes['cover_photo_path'] = $value;
+    }
   }
 }

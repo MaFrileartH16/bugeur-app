@@ -31,6 +31,8 @@ export const AppLayout = (props) => {
           {props.children}
         </Flex>
 
+        {/*<FloatingBottomNavigationBar />*/}
+
         <Footer />
       </Stack>
 

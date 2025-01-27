@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 use Throwable;
@@ -18,53 +18,46 @@ class UserController extends Controller
   public function index(): Response
   {
     try {
-      // Generate cache key based on request parameters
-      $cacheKey = 'users_index_page_' . request('page', 1) .
-        'search' . request('search') .
-        'sort' . request('sort_key') .
-        'direction' . request('sort_direction') .
-        'filter_key' . request('filter_key') .
-        'filter_value' . request('filter_value') .
-        'per_page' . request('per_page', 10);
+      $query = User::withTrashed()->where('role', '!=', 'Admin');
 
-      // Get users data from cache or database
-      $users = Cache::remember($cacheKey, now()->addMinutes(10), function () {
-        $query = User::withTrashed()->where('role', '!=', 'admin');
+      // Search
+      if (request('search')) {
+        $query->where(function ($q) {
+          $q->where('full_name', 'like', '%' . request('search') . '%')
+            ->orWhere('email', 'like', '%' . request('search') . '%');
+        });
+      }
 
-        // Search
-        if (request('search')) {
-          $query->where(function ($q) {
-            $q->where('full_name', 'like', '%' . request('search') . '%')
-              ->orWhere('email', 'like', '%' . request('search') . '%');
-          });
-        }
+      // Filter
+      if (request('filter_key') && request('filter_value')) {
+        $filterKey = request('filter_key');
+        $filterValue = request('filter_value');
 
-        // Filter
-        if (request('filter_key') && request('filter_value')) {
-          $filterKey = request('filter_key');
-          $filterValue = request('filter_value');
-
-          if ($filterKey === 'role') {
-            $query->where('role', str_replace(' ', '_', strtolower($filterValue)));
-          } elseif ($filterKey === 'status') {
-            if ($filterValue === 'active') {
-              $query->whereNull('deleted_at');
-            } elseif ($filterValue === 'inactive') {
-              $query->whereNotNull('deleted_at');
-            }
+        if ($filterKey === 'role') {
+          $query->where('role');
+        } elseif ($filterKey === 'status') {
+          if ($filterValue === 'active') {
+            $query->whereNull('deleted_at');
+          } elseif ($filterValue === 'inactive') {
+            $query->whereNotNull('deleted_at');
           }
         }
+      }
 
-        // Sort
-        if (request('sort_key') && request('sort_direction')) {
-          $query->orderBy(request('sort_key'), request('sort_direction'));
-        } else {
-          $query->orderBy('full_name', 'asc');
-        }
+      // Filter by user (if user filter is provided)
+      if (request('user')) {
+        $query->where('id', request('user'));
+      }
 
-        // Pagination
-        return $query->paginate(request('per_page', 10));
-      });
+      // Sort
+      if (request('sort_key') && request('sort_direction')) {
+        $query->orderBy(request('sort_key'), request('sort_direction'));
+      } else {
+        $query->orderBy('full_name', 'asc');
+      }
+
+      // Pagination
+      $users = $query->paginate(request('per_page', 10));
 
       return Inertia::render('Users/Index', [
         'title' => 'Users',
@@ -74,6 +67,7 @@ class UserController extends Controller
         'sort_direction' => request('sort_direction'),
         'filter_key' => request('filter_key'),
         'filter_value' => request('filter_value'),
+        'user' => request('user'),
         'per_page' => request('per_page', 10),
         'notification' => session()->pull('notification'),
       ]);
@@ -86,6 +80,7 @@ class UserController extends Controller
         'sort_direction' => request('sort_direction'),
         'filter_key' => request('filter_key'),
         'filter_value' => request('filter_value'),
+        'user' => request('user'),
         'per_page' => request('per_page', 10),
         'notification' => [
           'status' => 'error',
@@ -102,31 +97,20 @@ class UserController extends Controller
   public function store(Request $request): RedirectResponse
   {
     try {
+      // Handle profile photo upload
+      $profilePhotoPath = null;
+      if ($request->hasFile('profile_photo')) {
+        $profilePhotoPath = $request->file('profile_photo')->store('profile-photos', 'public');
+      }
+
+      // Create user
       User::create([
         'full_name' => $request->full_name,
         'email' => $request->email,
         'role' => $request->role,
         'password' => bcrypt($request->password),
+        'profile_photo_path' => $profilePhotoPath,
       ]);
-
-      // Refresh cache for all users index pages
-      $page = 1;
-      while (true) {
-        $cacheKey = 'users_index_page_' . $page .
-          'search' . request('search') .
-          'sort' . request('sort_key') .
-          'direction' . request('sort_direction') .
-          'filter_key' . request('filter_key') .
-          'filter_value' . request('filter_value') .
-          'per_page' . request('per_page', 10);
-
-        if (!Cache::has($cacheKey)) {
-          break;
-        }
-
-        Cache::forget($cacheKey); // Clear old cache
-        $page++;
-      }
 
       return redirect()->route('users.index', ['page' => 1])->with('notification', [
         'status' => 'success',
@@ -155,15 +139,26 @@ class UserController extends Controller
   /**
    * Show the form for editing the specified user.
    */
-  public function edit(User $user): Response|RedirectResponse
+  public function edit($userId): Response|RedirectResponse
   {
     try {
+      // Custom route model binding langsung di method edit
+      $user = User::withTrashed()->findOrFail($userId);
+
       return Inertia::render('Users/Edit', [
         'title' => 'Edit User',
         'user' => $user,
         'notification' => session()->pull('notification'),
       ]);
+    } catch (ModelNotFoundException $e) {
+      // Tangani error jika user tidak ditemukan
+      return back()->with('notification', [
+        'status' => 'error',
+        'title' => 'Error',
+        'message' => 'User not found.',
+      ]);
     } catch (Throwable $e) {
+      // Tangani error lainnya
       return back()->with('notification', [
         'status' => 'error',
         'title' => 'Error',
@@ -180,34 +175,15 @@ class UserController extends Controller
     try {
       $updateData = $request->all();
 
-      if (isset($updateData['password']) && !empty($updateData['password'])) {
-        $updateData['password'] = bcrypt($updateData['password']); // Hash password
-      } else {
+      // Jika tidak ada password baru, hapus key 'password' dari $updateData
+      if (empty($updateData['password'])) {
         unset($updateData['password']);
       }
 
+      // Update data user (mutator di model akan menghash password jika ada)
       $user->update($updateData);
 
-      // Refresh cache for all users index pages
-      $page = 1;
-      while (true) {
-        $cacheKey = 'users_index_page_' . $page .
-          'search' . request('search') .
-          'sort' . request('sort_key') .
-          'direction' . request('sort_direction') .
-          'filter_key' . request('filter_key') .
-          'filter_value' . request('filter_value') .
-          'per_page' . request('per_page', 10);
-
-        if (!Cache::has($cacheKey)) {
-          break;
-        }
-
-        Cache::forget($cacheKey); // Clear old cache
-        $page++;
-      }
-
-      return redirect()->route('users.index', ['page' => 1])->with('notification', [
+      return redirect()->route('users.index')->with('notification', [
         'status' => 'success',
         'title' => 'User Updated',
         'message' => 'User updated successfully.',
@@ -228,25 +204,6 @@ class UserController extends Controller
   {
     try {
       $user->delete();
-
-      // Refresh cache for all users index pages
-      $page = 1;
-      while (true) {
-        $cacheKey = 'users_index_page_' . $page .
-          'search' . request('search') .
-          'sort' . request('sort_key') .
-          'direction' . request('sort_direction') .
-          'filter_key' . request('filter_key') .
-          'filter_value' . request('filter_value') .
-          'per_page' . request('per_page', 10);
-
-        if (!Cache::has($cacheKey)) {
-          break;
-        }
-
-        Cache::forget($cacheKey); // Clear old cache
-        $page++;
-      }
 
       return redirect()->route('users.index', ['page' => 1])->with('notification', [
         'status' => 'success',
@@ -272,25 +229,6 @@ class UserController extends Controller
 
       if ($user->trashed()) {
         $user->restore();
-      }
-
-      // Refresh cache for all users index pages
-      $page = 1;
-      while (true) {
-        $cacheKey = 'users_index_page_' . $page .
-          'search' . request('search') .
-          'sort' . request('sort_key') .
-          'direction' . request('sort_direction') .
-          'filter_key' . request('filter_key') .
-          'filter_value' . request('filter_value') .
-          'per_page' . request('per_page', 10);
-
-        if (!Cache::has($cacheKey)) {
-          break;
-        }
-
-        Cache::forget($cacheKey); // Clear old cache
-        $page++;
       }
 
       return redirect()->route('users.index', ['page' => 1])->with('notification', [

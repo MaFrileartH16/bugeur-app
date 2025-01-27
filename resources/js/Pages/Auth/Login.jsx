@@ -90,7 +90,7 @@ const Login = (props) => {
               password.
             </Text>
 
-            <Stack gap={16} component="section" aria-labelledby="login-fields">
+            <Stack gap={32} component="section" aria-labelledby="login-fields">
               <Box>
                 <Text fw={500}>Email Address</Text>
 
@@ -118,21 +118,24 @@ const Login = (props) => {
                   leftSection={<IconPassword />}
                 />
               </Box>
-            </Stack>
 
-            <Button
-              fullWidth
-              type="submit"
-              leftSection={
-                !areFieldsFilled || hasErrors ? <IconLock /> : <IconLockOpen2 />
-              }
-              loading={form.processing}
-              disabled={!areFieldsFilled || hasErrors}
-              aria-label="Submit Login"
-              mt={16}
-            >
-              Login
-            </Button>
+              <Button
+                fullWidth
+                type="submit"
+                leftSection={
+                  !areFieldsFilled || hasErrors ? (
+                    <IconLock />
+                  ) : (
+                    <IconLockOpen2 />
+                  )
+                }
+                loading={form.processing}
+                disabled={!areFieldsFilled || hasErrors}
+                aria-label="Submit Login"
+              >
+                Login
+              </Button>
+            </Stack>
           </Container>
         </Center>
       </AppLayout>

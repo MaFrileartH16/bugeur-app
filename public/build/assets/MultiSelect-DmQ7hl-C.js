@@ -1,0 +1,1 @@
+import{j as t,Z as m}from"./app-D1ROa2dk.js";import{a as r}from"./AppLayout-6WbUBhn6.js";const a=({description:e,error:s,...l})=>t.jsxs(t.Fragment,{children:[e&&t.jsx(r,{c:"gray",mb:8,children:e}),t.jsx(m,{mt:e?0:8,...l,styles:{input:{borderColor:s?"red":void 0}}}),s&&t.jsx(r,{c:"red",mt:8,children:s})]});export{a as M};

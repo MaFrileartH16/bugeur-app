@@ -3,6 +3,7 @@ import {
   Avatar,
   Button,
   createTheme,
+  Image,
   Modal,
   MultiSelect,
   Pagination,
@@ -14,7 +15,7 @@ import {
 export const theme = createTheme({
   colors: {},
   fontFamily: 'Fredoka, serif',
-  primaryColor: 'blue',
+  primaryColor: 'indigo',
   headings: {
     sizes: {
       h1: { fontSize: '44px', fontWeight: '700', lineHeight: '56px' },
@@ -25,8 +26,8 @@ export const theme = createTheme({
       h6: { fontSize: '14px', fontWeight: '400', lineHeight: '20px' },
     },
   },
-  // white: '#f2f2f2',
-  // black: '#0d0d0d',
+  white: '#f2f2f2',
+  black: '#0d0d0d',
   // primaryShade: { light: 5, dark: 7 },
   autoContrast: true,
   radius: {
@@ -165,6 +166,11 @@ export const theme = createTheme({
           height: 48,
           padding: 16,
         },
+      },
+    }),
+    Image: Image.extend({
+      defaultProps: {
+        radius: 16,
       },
     }),
   },

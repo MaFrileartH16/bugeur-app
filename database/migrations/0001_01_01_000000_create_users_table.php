@@ -15,7 +15,7 @@ return new class extends Migration {
       $table->string('profile_photo_path')->nullable();
       $table->string('full_name');
       $table->string('email')->unique();
-      $table->enum('role', ['admin', 'project_manager', 'developer', 'quality_assurance']);
+      $table->enum('role', ['Admin', 'Project Manager', 'Developer', 'Quality Assurance']);
       $table->string('password');
       $table->rememberToken();
       $table->timestamps();

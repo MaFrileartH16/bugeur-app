@@ -12,7 +12,8 @@ return new class extends Migration {
   {
     Schema::create('projects', function (Blueprint $table) {
       $table->ulid('id')->primary();
-      $table->foreignUlid('manager_id')->constrained('users')->cascadeOnDelete();
+      $table->string('cover_photo_path')->nullable();
+      $table->foreignUlid('manager_id')->constrained('users')->cascadeOnUpdate();
       $table->string('title');
       $table->text('description');
       $table->timestamps();

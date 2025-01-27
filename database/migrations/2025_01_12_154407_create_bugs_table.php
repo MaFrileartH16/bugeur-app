@@ -11,6 +11,7 @@ return new class extends Migration {
   public function up(): void
   {
     Schema::create('bugs', function (Blueprint $table) {
+      $table->ulid('id')->primary();
       $table->foreignUlid('project_id')->constrained('projects')->cascadeOnDelete();
       $table->foreignUlid('creator_id')->constrained('users')->cascadeOnDelete();
       $table->foreignUlid('assignee_id')->nullable()->constrained('users')->cascadeOnDelete();

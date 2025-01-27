@@ -19,9 +19,9 @@ class ProjectFactory extends Factory
   public function definition(): array
   {
     return [
-      'manager_id' => User::where('role', 'project_manager')->inRandomOrder()->value('id')
+      'manager_id' => User::where('role', 'Project Manager')->inRandomOrder()->value('id')
         ?? User::factory()->create([
-          'role' => 'project_manager',
+          'role' => 'Project Manager',
         ])->id,
       'title' => $this->faker->sentence,
       'description' => $this->faker->paragraph,

@@ -17,7 +17,7 @@ import {
   IconKey,
   IconMail,
   IconPassword,
-  IconPhotoUp,
+  IconUpload,
   IconUser,
 } from '@tabler/icons-react';
 
@@ -25,7 +25,7 @@ const Edit = (props) => {
   const { user } = props.auth;
   const form = useForm({
     _method: 'put',
-    profile_photo_path: user.profile_photo_path || '',
+    profile_photo: user.profile_photo_path || '',
     full_name: user.full_name || '',
     email: user.email || '',
     password: '',
@@ -44,11 +44,11 @@ const Edit = (props) => {
   const handleProfilePhotoChange = (file) => {
     const error = validateProfilePhoto(file);
     if (error) {
-      form.setError('profile_photo_path', error);
+      form.setError('profile_photo', error);
       return;
     }
-    form.setData('profile_photo_path', file);
-    form.clearErrors('profile_photo_path');
+    form.setData('profile_photo', file);
+    form.clearErrors('profile_photo');
   };
 
   const validateEmail = (value) => {
@@ -98,7 +98,7 @@ const Edit = (props) => {
           description="Update your profile details."
         />
 
-        <Grid gutter={16} justify="flex-end">
+        <Grid gutter={32} justify="flex-end">
           <Grid.Col span={{ base: 12 }}>
             <Grid gutter={8} align="start">
               {/* Hapus gutter di sini */}
@@ -109,9 +109,9 @@ const Edit = (props) => {
                 <Group align="flex-start" spacing="sm">
                   <Avatar
                     src={
-                      form.data.profile_photo_path instanceof File
-                        ? URL.createObjectURL(form.data.profile_photo_path)
-                        : form.data.profile_photo_path
+                      form.data.profile_photo instanceof File
+                        ? URL.createObjectURL(form.data.profile_photo)
+                        : form.data.profile_photo
                     }
                     alt="Profile Photo"
                     size={80}
@@ -125,16 +125,17 @@ const Edit = (props) => {
                       <Button
                         variant="subtle"
                         {...props}
-                        leftSection={<IconPhotoUp />}
+                        leftSection={<IconUpload />}
                       >
-                        Upload
+                        {form.data.profile_photo ? 'Change' : 'Upload'} Profile
+                        Photo
                       </Button>
                     )}
                   </FileButton>
                 </Group>
-                {form.errors.profile_photo_path && (
-                  <Text color="red" size="sm">
-                    {form.errors.profile_photo_path}
+                {form.errors.profile_photo && (
+                  <Text c="red" size="sm">
+                    {form.errors.profile_photo}
                   </Text>
                 )}
               </Grid.Col>

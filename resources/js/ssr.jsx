@@ -1,6 +1,7 @@
 import { theme } from '@/theme.js';
 import { createInertiaApp } from '@inertiajs/react';
 import createServer from '@inertiajs/react/server';
+import '@mantine/carousel/styles.css';
 import '@mantine/charts/styles.css';
 import { MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';

@@ -1,29 +1,41 @@
 import { PageHeadings } from '@/Components/PageHeadings.jsx';
+import {
+  MultiSelect,
+  Select,
+  Textarea,
+  TextInput,
+} from '@/Components/index.jsx';
 import { AppLayout } from '@/Layouts/AppLayout.jsx';
 import { router, useForm } from '@inertiajs/react';
 import {
   Button,
-  Container,
+  FileButton,
+  Flex,
   Grid,
-  MultiSelect,
-  Select,
+  Group,
+  Image,
   Text,
-  Textarea,
-  TextInput,
   Title,
 } from '@mantine/core';
+import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
 import {
   IconAlignJustified,
   IconCornerDownLeft,
   IconFolder,
+  IconPhoto,
+  IconPhotoUp,
+  IconPhotoX,
+  IconUpload,
   IconUser,
   IconUsers,
+  IconX,
 } from '@tabler/icons-react';
 
 const Create = (props) => {
   const { user } = props.auth;
 
   const form = useForm({
+    cover_photo: '',
     title: '',
     description: '',
     manager_id: '',
@@ -100,59 +112,25 @@ const Create = (props) => {
     });
   };
 
-  const fields = [
-    {
-      label: 'Title',
-      value: form.data.title,
-      onChange: handleTitleChange,
-      error: form.errors.title,
-      placeholder: "Enter the project's title, e.g., Website Redesign",
-      description: 'Provide a concise and descriptive title for the project.',
-      leftSection: <IconFolder />,
-      component: TextInput,
-    },
-    {
-      label: 'Description',
-      value: form.data.description,
-      onChange: handleDescriptionChange,
-      error: form.errors.description,
-      placeholder: "Describe the project's objectives and scope",
-      description:
-        'Include key details and objectives to help the team understand the project.',
-      component: Textarea,
-      leftSection: <IconAlignJustified />,
-      minRows: 4,
-    },
-    {
-      label: 'Manager',
-      defaultValue: form.data.manager_id,
-      onChange: handleManagerChange,
-      error: form.errors.manager_id,
-      placeholder: 'Select a project manager',
-      description: 'Assign a manager who will oversee the project.',
-      leftSection: <IconUser />,
-      component: Select,
-      data: props.managers.map((manager) => ({
-        value: manager.id,
-        label: manager.full_name,
-      })),
-    },
-    {
-      label: 'Team Members',
-      value: form.data.team_members,
-      onChange: handleTeamMembersChange,
-      error: form.errors.team_members,
-      placeholder: 'Select team members',
-      description:
-        'Include at least one Developer and one Quality Assurance member.',
-      leftSection: <IconUsers />,
-      component: MultiSelect,
-      data: props.users.map((user) => ({
-        value: user.id,
-        label: `${user.full_name} (${user.role})`,
-      })),
-    },
-  ];
+  const validateCoverPhoto = (file) => {
+    if (file && !['image/png', 'image/jpeg', 'image/jpg'].includes(file.type)) {
+      return 'Only PNG, JPEG, and JPG formats are allowed.';
+    }
+    if (file && file.size > 2 * 1024 * 1024) {
+      return 'File size must not exceed 2 MB.';
+    }
+    return null;
+  };
+
+  const handleCoverPhotoChange = (file) => {
+    const error = validateCoverPhoto(file);
+    if (error) {
+      form.setError('cover_photo', error);
+      return;
+    }
+    form.setData('cover_photo', file);
+    form.clearErrors('cover_photo');
+  };
 
   const hasErrors = Object.keys(form.errors).length > 0;
   const isFormEmpty =
@@ -162,61 +140,237 @@ const Create = (props) => {
     form.data.team_members.length === 0;
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} encType="multipart/form-data">
       <AppLayout title="Create Project" user={user}>
-        <Container flex={1} size="xl" w="100%" py={32}>
-          <PageHeadings
-            title="Create New Project"
-            description="Provide the necessary details to start and define a new project within the system."
-            breadcrumbs={[
-              {
-                label: 'Projects',
-                onClick: () => router.get(route('projects.index')),
-              },
-              {
-                label: 'Create',
-                onClick: () => router.get(route('projects.create')),
-              },
-            ]}
-          />
+        <PageHeadings
+          title="Create New Project"
+          description="Provide the necessary details to start and define a new project within the system."
+          breadcrumbs={[
+            {
+              label: 'Projects',
+              onClick: () => router.get(route('projects.index')),
+            },
+            {
+              label: 'Create',
+              onClick: () => router.get(route('projects.create')),
+            },
+          ]}
+        />
 
-          <Grid gutter={32} justify="flex-end">
-            {fields.map(
-              (
-                { component: Component, label, description, ...restField },
-                index,
-              ) => (
-                <Grid.Col key={index} span={{ base: 12 }}>
-                  <Grid gutter={{ base: 8, sm: 0 }} align="start">
-                    <Grid.Col span={{ base: 12, sm: 4 }}>
-                      <Title order={5}>{label}</Title>
-                    </Grid.Col>
-                    <Grid.Col span={{ base: 12, sm: 8 }}>
-                      <Component {...restField} />
-                      {description && (
-                        <Text size="xs" color="dimmed" mt={8}>
-                          {description}
+        <Grid gutter={32} justify="flex-end">
+          {/* Cover Photo Field */}
+          <Grid.Col span={{ base: 12 }}>
+            <Grid gutter={8} align="start">
+              <Grid.Col span={{ base: 12, sm: 4 }}>
+                <Title order={5}>Cover Photo</Title>
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 8 }}>
+                {form.data.cover_photo ? (
+                  <Group align="flex-start" spacing="sm">
+                    <Flex w="100%">
+                      <Image
+                        radius={16}
+                        src={
+                          form.data.cover_photo instanceof File
+                            ? URL.createObjectURL(form.data.cover_photo)
+                            : form.data.cover_photo
+                        }
+                        alt="Cover Photo"
+                        flex={1}
+                        height={240}
+                        style={{ objectFit: 'cover' }}
+                      />
+                    </Flex>
+                    <Group>
+                      <FileButton
+                        onChange={handleCoverPhotoChange}
+                        accept="image/png,image/jpeg,image/jpg"
+                      >
+                        {(props) => (
+                          <Button
+                            c="blue"
+                            variant="subtle"
+                            {...props}
+                            leftSection={<IconPhotoUp />}
+                          >
+                            Change
+                          </Button>
+                        )}
+                      </FileButton>
+                      <Button
+                        variant="subtle"
+                        color="red"
+                        onClick={() => form.setData('cover_photo', '')}
+                        leftSection={<IconPhotoX />}
+                      >
+                        Remove
+                      </Button>
+                    </Group>
+                  </Group>
+                ) : (
+                  <Dropzone
+                    h={240}
+                    display="flex"
+                    style={{
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                    onDrop={(files) => handleCoverPhotoChange(files[0])}
+                    onReject={() =>
+                      form.setError(
+                        'cover_photo',
+                        'File rejected. Only images are allowed.',
+                      )
+                    }
+                    maxSize={2 * 1024 * 1024} // 2MB
+                    accept={IMAGE_MIME_TYPE}
+                  >
+                    <Group
+                      justify="center"
+                      gap="xl"
+                      style={{ pointerEvents: 'none' }}
+                    >
+                      <Dropzone.Accept>
+                        <IconUpload
+                          size={48}
+                          color="var(--mantine-color-blue-6)"
+                          stroke={1.5}
+                        />
+                      </Dropzone.Accept>
+                      <Dropzone.Reject>
+                        <IconX
+                          size={48}
+                          color="var(--mantine-color-red-6)"
+                          stroke={1.5}
+                        />
+                      </Dropzone.Reject>
+                      <Dropzone.Idle>
+                        <IconPhoto
+                          size={48}
+                          color="var(--mantine-color-dimmed)"
+                          stroke={1.5}
+                        />
+                      </Dropzone.Idle>
+
+                      <div>
+                        <Text size="md" inline>
+                          Drag image here or click to select file
                         </Text>
-                      )}
-                    </Grid.Col>
-                  </Grid>
-                </Grid.Col>
-              ),
-            )}
+                        <Text size="sm" c="dimmed" inline mt={8}>
+                          Only PNG, JPEG, and JPG files are allowed (max 2MB).
+                        </Text>
+                      </div>
+                    </Group>
+                  </Dropzone>
+                )}
+                {form.errors.cover_photo && (
+                  <Text c="red" size="sm" mt="sm">
+                    {form.errors.cover_photo}
+                  </Text>
+                )}
+              </Grid.Col>
+            </Grid>
+          </Grid.Col>
 
-            <Grid.Col span={{ base: 12, sm: 8, smOffset: 4 }}>
-              <Button
-                type="submit"
-                fullWidth
-                leftSection={<IconCornerDownLeft />}
-                disabled={form.processing || hasErrors || isFormEmpty}
-                loading={form.processing}
-              >
-                Create Project
-              </Button>
-            </Grid.Col>
-          </Grid>
-        </Container>
+          {/* Title Field */}
+          <Grid.Col span={{ base: 12 }}>
+            <Grid gutter={{ base: 8, sm: 0 }} align="start">
+              <Grid.Col span={{ base: 12, sm: 4 }}>
+                <Title order={5}>Title</Title>
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 8 }}>
+                <TextInput
+                  value={form.data.title}
+                  onChange={handleTitleChange}
+                  error={form.errors.title}
+                  placeholder="Enter the project's title, e.g., Website Redesign"
+                  leftSection={<IconFolder />}
+                  description="Provide a concise and descriptive title for the project."
+                />
+              </Grid.Col>
+            </Grid>
+          </Grid.Col>
+
+          {/* Description Field */}
+          <Grid.Col span={{ base: 12 }}>
+            <Grid gutter={{ base: 8, sm: 0 }} align="start">
+              <Grid.Col span={{ base: 12, sm: 4 }}>
+                <Title order={5}>Description</Title>
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 8 }}>
+                <Textarea
+                  value={form.data.description}
+                  onChange={handleDescriptionChange}
+                  error={form.errors.description}
+                  placeholder="Describe the project's objectives and scope"
+                  leftSection={<IconAlignJustified />}
+                  minRows={4}
+                  description="Include key details and objectives to help the team understand
+                  the project."
+                />
+              </Grid.Col>
+            </Grid>
+          </Grid.Col>
+
+          {/* Manager Field */}
+          <Grid.Col span={{ base: 12 }}>
+            <Grid gutter={{ base: 8, sm: 0 }} align="start">
+              <Grid.Col span={{ base: 12, sm: 4 }}>
+                <Title order={5}>Manager</Title>
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 8 }}>
+                <Select
+                  defaultValue={form.data.manager_id}
+                  onChange={handleManagerChange}
+                  error={form.errors.manager_id}
+                  placeholder="Select a project manager"
+                  leftSection={<IconUser />}
+                  data={props.managers.map((manager) => ({
+                    value: manager.id,
+                    label: manager.full_name,
+                  }))}
+                  description="Assign a manager who will oversee the project."
+                />
+              </Grid.Col>
+            </Grid>
+          </Grid.Col>
+
+          {/* Team Members Field */}
+          <Grid.Col span={{ base: 12 }}>
+            <Grid gutter={{ base: 8, sm: 0 }} align="start">
+              <Grid.Col span={{ base: 12, sm: 4 }}>
+                <Title order={5}>Team Members</Title>
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, sm: 8 }}>
+                <MultiSelect
+                  value={form.data.team_members}
+                  onChange={handleTeamMembersChange}
+                  error={form.errors.team_members}
+                  placeholder="Select team members"
+                  leftSection={<IconUsers />}
+                  data={props.members.map((member) => ({
+                    value: member.id,
+                    label: `${member.full_name} (${member.role})`,
+                  }))}
+                  description="Include at least one Developer and one Quality Assurance
+                  member."
+                />
+              </Grid.Col>
+            </Grid>
+          </Grid.Col>
+
+          {/* Submit Button */}
+          <Grid.Col span={{ base: 12, sm: 8 }} align="end">
+            <Button
+              type="submit"
+              leftSection={<IconCornerDownLeft />}
+              disabled={form.processing || hasErrors || isFormEmpty}
+              loading={form.processing}
+            >
+              Create Project
+            </Button>
+          </Grid.Col>
+        </Grid>
       </AppLayout>
     </form>
   );

@@ -1,4 +1,4 @@
-import { NavigationDrawer } from '@/Components/NavigationDrawer';
+import { NavigationDrawer } from '@/Components/NavigationDrawer.jsx';
 import { UserMenu } from '@/Components/UserMenu';
 import { ActionIcon, Box, Divider, Flex } from '@mantine/core';
 import { IconBug } from '@tabler/icons-react';

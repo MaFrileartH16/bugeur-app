@@ -16,8 +16,7 @@ class BugController extends Controller
    */
   public function index(Project $project)
   {
-    $bugs = Bug::where('project_id', $project->id)
-      ->get();
+    $bugs = Bug::where('project_id', $project->id)->get(); // Ambil data langsung dari database
 
     return Inertia::render('Bugs/Index', [
       'project' => $project,
@@ -30,7 +29,7 @@ class BugController extends Controller
    */
   public function edit(Project $project, Bug $bug)
   {
-    $users = User::all();
+    $users = User::all(); // Ambil data langsung dari database
 
     return Inertia::render('Bugs/Edit', [
       'project' => $project,
@@ -78,35 +77,33 @@ class BugController extends Controller
       ->with('success', 'Bug updated successfully.');
   }
 
-
   /**
    * Store a newly created bug in storage.
    */
   public function store(Request $request, Project $project)
   {
-//    dd($request->all());
-    $validated = $request->validate([
-      'title' => 'required|string|max:255',
-      'description' => 'required|string',
-      'assignee_id' => 'nullable|exists:users,id',
-      'evidence_image' => 'nullable|image|max:2048',
-    ]);
-
+    // Ambil data langsung dari request tanpa validasi
+    $title = $request->input('title');
+    $description = $request->input('description');
+    $assigneeId = $request->input('assignee_id');
     $evidenceImage = null;
 
+    // Handle file upload jika ada
     if ($request->hasFile('evidence_image')) {
       $evidenceImage = $request->file('evidence_image')->store('evidence_images', 'public');
     }
 
+    // Buat bug baru
     Bug::create([
       'project_id' => $project->id,
       'creator_id' => auth()->id(),
-      'assignee_id' => $validated['assignee_id'] ?? null,
-      'title' => $validated['title'],
-      'description' => $validated['description'],
+      'assignee_id' => $assigneeId,
+      'title' => $title,
+      'description' => $description,
       'evidence_image' => $evidenceImage,
     ]);
 
+    // Redirect dengan notifikasi
     return redirect()
       ->route('projects.show', $project->id)
       ->with('notification', [
@@ -121,7 +118,7 @@ class BugController extends Controller
    */
   public function create(Project $project)
   {
-    $users = User::where('role', 'developer')->get();
+    $users = User::where('role', 'developer')->get(); // Ambil data langsung dari database
 
     return Inertia::render('Bugs/Create', [
       'project' => $project,

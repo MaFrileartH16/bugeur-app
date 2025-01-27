@@ -18,7 +18,7 @@ class WorkingOnSeeder extends Seeder
     $projects = Project::withTrashed()->get();
 
     $projects->each(function ($project) {
-      $roles = ['developer', 'quality_assurance']; // Role yang harus di-assign
+      $roles = ['Developer', 'Quality Assurance']; // Role yang harus di-assign
 
       foreach ($roles as $role) {
         // Ambil user dengan role tertentu yang belum memiliki relasi ke proyek ini

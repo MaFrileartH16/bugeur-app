@@ -127,8 +127,9 @@ const Index = (props) => {
   };
 
   // Handler untuk edit user
-  const handleEditUser = (userId) => {
-    router.get(route('users.edit', userId));
+  const handleEditUser = (user) => {
+    console.log(user);
+    router.get(route('users.edit', { user: user.id }));
   };
 
   // Handler untuk restore user
@@ -200,6 +201,7 @@ const Index = (props) => {
                 { label: 'Full Name', value: 'full_name' },
                 { label: 'Email', value: 'email' },
                 { label: 'Role', value: 'role' },
+                { label: 'Created At', value: 'created_at' },
               ]}
               onChange={(value) => handleSort(value, sortQuery.direction)}
             />
@@ -328,134 +330,129 @@ const Index = (props) => {
       <Grid gutter={32}>
         {/* Sidebar untuk Search, Sort, Filter, dan Pagination */}
         <Grid.Col span={{ base: 0, lg: 3 }}>
-          <Card
-            shadow="xs"
-            p={16}
-            withBorder
+          <Stack
+            gap={32}
             pos="sticky"
             top={112}
             display={{
               base: 'none',
-              lg: opened ? 'none' : 'block', // Sembunyikan saat modal terbuka
+              lg: opened ? 'none' : 'flex',
             }}
           >
-            <Stack gap={32}>
-              {/* Search Input */}
-              <Box>
-                <Text fw={500}>Search</Text>
-                <TextInput
-                  leftSection={<IconSearch />}
-                  placeholder="Search by name or email..."
-                  value={searchQuery}
-                  onChange={(e) => handleSearch(e.target.value)}
-                />
-              </Box>
+            {/* Search Input */}
+            <Box>
+              <Text fw={500}>Search</Text>
+              <TextInput
+                leftSection={<IconSearch />}
+                placeholder="Search by name or email..."
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+              />
+            </Box>
 
-              {/* Sort Input */}
-              <Box>
-                <Text fw={500}>Sort</Text>
+            {/* Sort Input */}
+            <Box>
+              <Text fw={500}>Sort</Text>
+              <Select
+                clearable
+                leftSection={<IconArrowsUpDown />}
+                placeholder="Sort by..."
+                value={sortQuery.key}
+                data={[
+                  { label: 'Full Name', value: 'full_name' },
+                  { label: 'Email', value: 'email' },
+                  { label: 'Role', value: 'role' },
+                  { label: 'Created At', value: 'created_at' },
+                ]}
+                onChange={(value) => handleSort(value, sortQuery.direction)}
+              />
+              {sortQuery.key && (
+                <Select
+                  leftSection={
+                    sortQuery.direction === 'asc' ? (
+                      <IconSortAscendingLetters />
+                    ) : (
+                      <IconSortDescendingLetters />
+                    )
+                  }
+                  placeholder="Direction..."
+                  value={sortQuery.direction}
+                  data={[
+                    { label: 'Ascending', value: 'asc' },
+                    { label: 'Descending', value: 'desc' },
+                  ]}
+                  onChange={(value) => handleSort(sortQuery.key, value)}
+                />
+              )}
+            </Box>
+
+            {/* Filter Input */}
+            <Box>
+              <Text fw={500}>Filter</Text>
+              <Select
+                clearable
+                leftSection={<IconFilter />}
+                placeholder="Filter by..."
+                value={filterKey}
+                data={[
+                  { label: 'Role', value: 'role' },
+                  { label: 'Status', value: 'status' },
+                ]}
+                onChange={(value) => handleFilterChange(value, '')}
+              />
+              {filterKey && (
                 <Select
                   clearable
-                  leftSection={<IconArrowsUpDown />}
-                  placeholder="Sort by..."
-                  value={sortQuery.key}
-                  data={[
-                    { label: 'Full Name', value: 'full_name' },
-                    { label: 'Email', value: 'email' },
-                    { label: 'Role', value: 'role' },
-                  ]}
-                  onChange={(value) => handleSort(value, sortQuery.direction)}
+                  leftSection={
+                    filterKey === 'role' ? <IconHierarchy3 /> : <IconBolt />
+                  }
+                  placeholder={
+                    filterKey === 'role' ? 'Select role...' : 'Select status...'
+                  }
+                  value={filterValue}
+                  data={
+                    filterKey === 'role'
+                      ? [
+                          {
+                            label: 'Project Manager',
+                            value: 'Project Manager',
+                          },
+                          { label: 'Developer', value: 'Developer' },
+                          {
+                            label: 'Quality Assurance',
+                            value: 'Quality Assurance',
+                          },
+                        ]
+                      : [
+                          { label: 'Active', value: 'active' },
+                          { label: 'Inactive', value: 'inactive' },
+                        ]
+                  }
+                  onChange={(value) => handleFilterChange(filterKey, value)}
+                  mt="sm"
                 />
-                {sortQuery.key && (
-                  <Select
-                    leftSection={
-                      sortQuery.direction === 'asc' ? (
-                        <IconSortAscendingLetters />
-                      ) : (
-                        <IconSortDescendingLetters />
-                      )
-                    }
-                    placeholder="Direction..."
-                    value={sortQuery.direction}
-                    data={[
-                      { label: 'Ascending', value: 'asc' },
-                      { label: 'Descending', value: 'desc' },
-                    ]}
-                    onChange={(value) => handleSort(sortQuery.key, value)}
-                  />
-                )}
-              </Box>
+              )}
+            </Box>
 
-              {/* Filter Input */}
-              <Box>
-                <Text fw={500}>Filter</Text>
-                <Select
-                  clearable
-                  leftSection={<IconFilter />}
-                  placeholder="Filter by..."
-                  value={filterKey}
-                  data={[
-                    { label: 'Role', value: 'role' },
-                    { label: 'Status', value: 'status' },
-                  ]}
-                  onChange={(value) => handleFilterChange(value, '')}
-                />
-                {filterKey && (
-                  <Select
-                    clearable
-                    leftSection={
-                      filterKey === 'role' ? <IconHierarchy3 /> : <IconBolt />
-                    }
-                    placeholder={
-                      filterKey === 'role'
-                        ? 'Select role...'
-                        : 'Select status...'
-                    }
-                    value={filterValue}
-                    data={
-                      filterKey === 'role'
-                        ? [
-                            {
-                              label: 'Project Manager',
-                              value: 'Project Manager',
-                            },
-                            { label: 'Developer', value: 'Developer' },
-                            {
-                              label: 'Quality Assurance',
-                              value: 'Quality Assurance',
-                            },
-                          ]
-                        : [
-                            { label: 'Active', value: 'active' },
-                            { label: 'Inactive', value: 'inactive' },
-                          ]
-                    }
-                    onChange={(value) => handleFilterChange(filterKey, value)}
-                    mt="sm"
-                  />
-                )}
-              </Box>
-
-              {/* Items per Page Input */}
-              <Box>
-                <Text fw={500}>Items per page</Text>
-                <Select
-                  clearable={false}
-                  leftSection={<IconNumber />}
-                  placeholder="Select items per page..."
-                  value={perPage}
-                  data={[
-                    { label: '10', value: '10' },
-                    { label: '20', value: '20' },
-                    { label: '30', value: '30' },
-                    { label: '40', value: '40' },
-                    { label: '50', value: '50' },
-                  ]}
-                  onChange={handlePerPageChange}
-                />
-              </Box>
-            </Stack>
-          </Card>
+            {/* Items per Page Input */}
+            <Box>
+              <Text fw={500}>Items per page</Text>
+              <Select
+                clearable={false}
+                leftSection={<IconNumber />}
+                placeholder="Select items per page..."
+                value={perPage}
+                data={[
+                  { label: '10', value: '10' },
+                  { label: '20', value: '20' },
+                  { label: '30', value: '30' },
+                  { label: '40', value: '40' },
+                  { label: '50', value: '50' },
+                ]}
+                onChange={handlePerPageChange}
+              />
+            </Box>
+          </Stack>
         </Grid.Col>
 
         {/* Main Content */}
@@ -555,7 +552,7 @@ const Index = (props) => {
                           h={48}
                           color="yellow"
                           leftSection={<IconEdit />}
-                          onClick={() => handleEditUser(user.id)}
+                          onClick={() => handleEditUser(user)}
                         >
                           Edit
                         </Menu.Item>
@@ -569,7 +566,7 @@ const Index = (props) => {
                             leftSection={<IconCheck />}
                             onClick={() => handleRestoreUser(user)}
                           >
-                            Restore
+                            Activate
                           </Menu.Item>
                         ) : (
                           // Jika deleted_at null, tampilkan tombol Delete
@@ -579,7 +576,7 @@ const Index = (props) => {
                             leftSection={<IconX />}
                             onClick={() => handleDeleteUser(user)}
                           >
-                            Delete
+                            Deactivate
                           </Menu.Item>
                         )}
                       </Menu.Dropdown>

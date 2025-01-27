@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
       UserSeeder::class,
       ProjectSeeder::class,
       WorkingOnSeeder::class,
-//      BugSeeder::class,
+      BugSeeder::class,
     ]);
   }
 }

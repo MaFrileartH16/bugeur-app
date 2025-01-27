@@ -13,17 +13,16 @@ class UserSeeder extends Seeder
    */
   public function run(): void
   {
-    // Buat admin jika belum ada
     if (!User::where('role', 'admin')->exists()) {
       User::factory()->create([
         'full_name' => 'Admin',
         'email' => 'admin@bugeur.id',
-        'role' => 'admin',
+        'role' => 'Admin',
         'password' => 'admin@bugeur.id',
       ]);
     }
 
-    $roles = ['project_manager', 'developer', 'quality_assurance'];
+    $roles = ['Project Manager', 'Developer', 'Quality Assurance'];
 
     foreach ($roles as $role) {
       User::factory()->create([

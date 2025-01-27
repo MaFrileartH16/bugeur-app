@@ -13,7 +13,7 @@ class ProjectSeeder extends Seeder
    */
   public function run(): void
   {
-    $totalProjects = 100; // Total proyek yang akan dibuat
+    $totalProjects = 1; // Total proyek yang akan dibuat
     $availableYears = range(2015, now()->year); // Rentang tahun dari 2015 hingga tahun sekarang
     $selectedYears = collect($availableYears)->random(rand(3, count($availableYears))); // Pilih tahun secara acak
 

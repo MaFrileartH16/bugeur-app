@@ -1,0 +1,1 @@
+import{j as e,S as n}from"./app-D1ROa2dk.js";import{a as r}from"./AppLayout-6WbUBhn6.js";const l=({description:t,error:s,...m})=>e.jsxs(e.Fragment,{children:[t&&e.jsx(r,{c:"gray",mb:8,children:t}),e.jsx(n,{mt:t?0:8,...m,styles:{input:{borderColor:s?"red":void 0}}}),s&&e.jsx(r,{c:"red",mt:8,children:s})]});export{l as S};
