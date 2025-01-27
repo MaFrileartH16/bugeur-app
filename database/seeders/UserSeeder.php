@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
    */
   public function run(): void
   {
-    if (!User::where('role', 'admin')->exists()) {
+    if (!User::where('role', 'Admin')->exists()) {
       User::factory()->create([
         'full_name' => 'Admin',
         'email' => 'admin@bugeur.id',
@@ -29,7 +29,7 @@ class UserSeeder extends Seeder
         'role' => $role,
       ]);
 
-      $additionalUsers = random_int(1, 1);
+      $additionalUsers = random_int(1, 10);
       User::factory($additionalUsers)->create([
         'role' => $role,
       ])->each(function ($user) {
