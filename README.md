@@ -26,3 +26,16 @@ Aplikasi ini memiliki empat peran pengguna dengan hak akses yang berbeda:
 - **Ringkasan Data**: Setiap aktor dapat melihat ringkasan data yang relevan dengan peran mereka, seperti total
   pengguna, proyek, dan bug.
 - **Autentikasi Pengguna**: Setiap pengguna memiliki akses yang disesuaikan dengan peran mereka.
+
+## Cara Mencoba Aplikasi
+
+Untuk mencoba aplikasi **Bugeur**, Anda dapat masuk sebagai **Admin** dengan kredensial berikut:
+
+- **Email**: admin@bugeur.id
+- **Password**: admin@bugeur.id
+
+Setelah login, Anda akan memiliki akses penuh untuk mengelola pengguna, proyek, serta melihat dan mengelola bug yang ada.
+
+Pastikan Anda telah menyiapkan akses yang tepat pada browser yang mendukung aplikasi web untuk pengalaman terbaik.
+
+Jika Anda memiliki pertanyaan lebih lanjut atau perlu bantuan terkait aplikasi, jangan ragu untuk menghubungi tim pengembang.
